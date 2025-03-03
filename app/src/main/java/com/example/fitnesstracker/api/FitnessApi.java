@@ -25,4 +25,7 @@ public interface FitnessApi {
     @GET("workouts")
     Call<List<Workout>> getWorkouts(@Header("Authorization") String token);
 
+    @GET("auth/users")
+    Call<List<User>> getAllUsers(); // метод для получения всех пользователей
+
 }

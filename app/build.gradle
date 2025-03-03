@@ -74,8 +74,10 @@ dependencies {
 
     implementation libs.androidx.cardview
     implementation libs.converter.gson
+    implementation libs.material.v150
 
-
+    implementation libs.play.services.maps
+    implementation libs.play.services.location
 }
 
 configurations {

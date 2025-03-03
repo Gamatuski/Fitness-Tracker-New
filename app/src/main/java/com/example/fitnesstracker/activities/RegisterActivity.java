@@ -21,11 +21,11 @@ import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.RegisterRequest;
 import com.example.fitnesstracker.models.RegisterResponse;
-import com.example.fitnesstracker.models.User;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
     private CardView registerCard;
     private TextView titleTextView, errorTextView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
+
         heightEditText = findViewById(R.id.heightEditText);
         weightEditText = findViewById(R.id.weightEditText);
         registerButton = findViewById(R.id.registerButton);
@@ -59,10 +61,13 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
+
             int height = Integer.parseInt(heightEditText.getText().toString());
             int weight = Integer.parseInt(weightEditText.getText().toString());
 
-            registerUser(email, password, height, weight);
+            if (validateInput(email, password, height, weight)) {
+                registerUser(email, password, height, weight);
+            }
         });
     }
 
@@ -160,6 +165,22 @@ public class RegisterActivity extends AppCompatActivity {
                 showError("Ошибка сети");
             }
         });
+    }
+
+    private boolean validateInput(String email, String password, int height, int weight) {
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            showError("Введите корректный email");
+            return false;
+        }
+        if (password.isEmpty() || password.length() < 6) {
+            showError("Пароль должен содержать не менее 6 символов");
+            return false;
+        }
+        if (height <= 0 || weight <= 0) {
+            showError("Рост и вес должны быть положительными числами");
+            return false;
+        }
+        return true;
     }
 
     private void showError(String errorMessage) {

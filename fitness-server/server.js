@@ -19,6 +19,11 @@ app.get('/', (req, res) => {
     res.json({ message: 'Сервер Fitness Tracker работает!' });
 });
 
+// Маршрут для получения всех пользователей
+app.get('/auth/users', (req, res) => {
+    res.status(200).json({ success: true, users: users });
+});
+
 // Регистрация
 app.post('/auth/register', async (req, res) => {
     const { email, password, height, weight } = req.body;

@@ -49,13 +49,14 @@
                 android:id="@+id/passwordEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
+                android:hint="Пароль"
                 android:inputType="textPassword"
                 android:padding="12dp"
                 android:background="@drawable/edittext_background"
                 android:layout_marginBottom="16dp"/>
 
             <!-- Поле для ввода роста -->
+
             <EditText
                 android:id="@+id/heightEditText"
                 android:layout_width="match_parent"
@@ -96,6 +97,7 @@
                 android:backgroundTint="@color/purpule"
                 android:textColor="@color/white"
                 android:padding="12dp"/>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

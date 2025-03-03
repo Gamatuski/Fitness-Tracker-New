@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_plan"
+        android:icon="@drawable/ic_plan"
+        android:title="План" />
+    <item
+        android:id="@+id/nav_progress"
+        android:icon="@drawable/ic_progress"
+        android:title="Прогресс" />
+    <item
+        android:id="@+id/nav_start"
+        android:icon="@drawable/ic_start"
+        android:title="Начать" />
+    <item
+        android:id="@+id/nav_steps"
+        android:icon="@drawable/ic_steps"
+        android:title="Шаги" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Настройки" />
+</menu>
