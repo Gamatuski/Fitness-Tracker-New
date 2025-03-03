@@ -1,0 +1,85 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.example.fitnesstracker'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.example.fitnesstracker"
+        minSdk 35
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.0'
+    }
+}
+
+dependencies {
+
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+
+    // Jetpack Compose
+    implementation libs.ui
+    implementation libs.androidx.material
+    implementation libs.androidx.ui.tooling.preview
+    implementation libs.androidx.activity.compose
+
+    // Retrofit для работы с API
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.logging.interceptor
+
+    // Room для локальной базы данных
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.compiler
+
+    // Coroutines для асинхронных операций
+    implementation libs.kotlinx.coroutines.android
+
+    // Навигация в Compose
+    implementation libs.androidx.navigation.compose
+
+    // Для работы с Secure Storage
+    implementation libs.androidx.security.crypto
+
+    // Исключение com.intellij:annotations:12.0
+    compileOnly libs.annotations
+
+    implementation libs.androidx.cardview
+    implementation libs.converter.gson
+
+
+}
+
+configurations {
+    configureEach {
+        exclude group: 'com.intellij', module: 'annotations'
+    }
+}

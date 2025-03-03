@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "test@example.com",
+      "password": "password123",
+      "height": "180",
+      "weight": "70"
+    },
+    {
+      "id": "652a",
+      "email": "123@mail.ru",
+      "height": 170,
+      "password": "1234",
+      "weight": 66
+    }
+  ]
+}
