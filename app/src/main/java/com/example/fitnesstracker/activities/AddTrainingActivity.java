@@ -1,19 +1,34 @@
 package com.example.fitnesstracker.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fitnesstracker.R;
+import com.example.fitnesstracker.api.FitnessApi;
+import com.example.fitnesstracker.api.RetrofitClient;
+import com.example.fitnesstracker.models.ActivityRequest;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddTrainingActivity extends AppCompatActivity {
 
     private TextView cancelTextView, saveTextView;
-    private EditText actionEditText, distanceEditText, caloriesEditText, stepsEditText, durationEditText, startDateEditText;
+    private EditText  distanceEditText, caloriesEditText, stepsEditText, durationEditText, startDateEditText;
+    private Spinner actionSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,12 +38,43 @@ public class AddTrainingActivity extends AppCompatActivity {
         // Инициализация элементов UI
         cancelTextView = findViewById(R.id.cancelTextView);
         saveTextView = findViewById(R.id.saveTextView);
-        actionEditText = findViewById(R.id.actionEditText);
+        actionSpinner = findViewById(R.id.actionSpinner);
+
+        // Создание адаптера для Spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.activities_array,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        actionSpinner.setAdapter(adapter);
+
         distanceEditText = findViewById(R.id.distanceEditText);
         caloriesEditText = findViewById(R.id.caloriesEditText);
         stepsEditText = findViewById(R.id.stepsEditText);
         durationEditText = findViewById(R.id.durationEditText);
         startDateEditText = findViewById(R.id.startDateEditText);
+
+        // Добавление TextWatcher для автоматического форматирования даты
+        startDateEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Форматирование текста
+                if (s.length() == 2 && before == 1) {
+                    startDateEditText.setText(s + ".");
+                    startDateEditText.setSelection(s.length() + 1);
+                } else if (s.length() == 5 && before == 4) {
+                    startDateEditText.setText(s + ".");
+                    startDateEditText.setSelection(s.length() + 1);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         // Обработчик нажатия на "Отменить"
         cancelTextView.setOnClickListener(new View.OnClickListener() {
@@ -48,27 +94,48 @@ public class AddTrainingActivity extends AppCompatActivity {
     }
 
     private void saveTrainingData() {
-        // Получение данных из EditText полей
-        String action = actionEditText.getText().toString();
-        String distance = distanceEditText.getText().toString();
-        String calories = caloriesEditText.getText().toString();
-        String steps = stepsEditText.getText().toString();
-        String duration = durationEditText.getText().toString();
-        String startDate = startDateEditText.getText().toString();
+        // Получение выбранного действия из Spinner
+        String action = actionSpinner.getSelectedItem().toString();
+        double distance = Double.parseDouble(distanceEditText.getText().toString());
+        int calories = Integer.parseInt(caloriesEditText.getText().toString());
+        int steps = Integer.parseInt(stepsEditText.getText().toString());
+        int duration = Integer.parseInt(durationEditText.getText().toString());
+        String date = startDateEditText.getText().toString();
 
-        // TODO: Валидация введенных данных (например, проверка на пустоту обязательных полей, форматы чисел и даты)
+        // Проверка обязательных полей
+        if (action.isEmpty() || date.isEmpty()) {
+            Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // TODO: Сохранение данных тренировки в базу данных (здесь пока просто вывод в Toast)
+        // Получаем userId из SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
+        String userId = sharedPreferences.getString("userId", null);
 
-        String message = "Действие: " + action + "\n" +
-                "Растояние: " + distance + "\n" +
-                "Калории: " + calories + "\n" +
-                "Шаги: " + steps + "\n" +
-                "Длительность: " + duration + "\n" +
-                "Дата начала: " + startDate;
+        if (userId == null) {
+            Toast.makeText(this, "Ошибка: Пользователь не авторизован", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        Toast.makeText(this, "Данные сохранены:\n" + message, Toast.LENGTH_LONG).show();
+        ActivityRequest activityRequest = new ActivityRequest(action, distance, calories, steps, duration, date);
 
-        finish(); // Закрываем активность после "сохранения" (в реальности - после успешного сохранения в БД)
+        FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
+        Call<ResponseBody> call = api.addActivity(userId, activityRequest);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(AddTrainingActivity.this, "Тренировка сохранена", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(AddTrainingActivity.this, "Ошибка при сохранении тренировки", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(AddTrainingActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

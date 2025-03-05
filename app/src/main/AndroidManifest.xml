@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+
 
     <application
         android:allowBackup="true"
@@ -25,6 +29,14 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDuCxcEKKesIgLp9Q9SX65HpZDHvkcndn4" />
+
+        <service
+            android:name=".service.StepCounterService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="health"
+            >
+        </service>
 
 
         <activity android:name=".activities.RegisterActivity" />

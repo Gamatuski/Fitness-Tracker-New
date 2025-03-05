@@ -2,10 +2,6 @@ package com.example.fitnesstracker.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,25 +31,22 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StepsFragment extends Fragment implements SensorEventListener, OnChartValueSelectedListener {
+public class StepsFragment extends Fragment implements OnChartValueSelectedListener {
     private TextView titleTextView;
     private ProgressBar progressCircle;
     private TextView stepsCountTextView, todayTextView;
-    private SensorManager sensorManager;
-    private Sensor stepCounterSensor;
-    private int totalSteps = 0; // Общее количество шагов (с сенсора)
-    private int goalSteps = 5000; // Цель шагов
     private BarChart barChart;
     private List<Integer> stepsDataList = new ArrayList<>(); // Список для хранения данных о шагах из БД (для графика)
+    private int goalSteps = 5000; // Цель шагов
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,23 +63,15 @@ public class StepsFragment extends Fragment implements SensorEventListener, OnCh
         StyleTitleText styleTitleText = new StyleTitleText();
         styleTitleText.styleTitleText(titleTextView);
 
-        // Инициализация SensorManager для шагомера
-        sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager != null) {
-            stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        }
-
         // Настройка графика
         setupBarChart();
-
-        // Загрузка данных о шагах из базы данных с сервера
-        loadStepsDataFromDatabase();
 
         // Установка слушателя нажатий на график
         barChart.setOnChartValueSelectedListener(this);
 
         return view;
     }
+
 
     private void loadStepsDataFromDatabase() {
         // Получение userId из SharedPreferences
@@ -112,6 +97,8 @@ public class StepsFragment extends Fragment implements SensorEventListener, OnCh
                         stepsDataList = stepsResponse.getSteps();
                         if (stepsDataList != null && stepsDataList.size() == 7) {
                             updateBarChart(stepsDataList); // Обновление графика данными с сервера
+                            // Обновление UI для текущего дня при загрузке данных
+                            updateUIForDay(stepsDataList.get(getCurrentDayIndex()));
                         } else {
                             showError("Неверный формат данных о шагах с сервера.");
                         }
@@ -143,41 +130,9 @@ public class StepsFragment extends Fragment implements SensorEventListener, OnCh
     @Override
     public void onResume() {
         super.onResume();
-        // Регистрация слушателя шагов при возобновлении фрагмента
-        if (stepCounterSensor != null) {
-            sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
+        loadStepsDataFromDatabase(); // Загрузка данных о шагах при каждом возобновлении фрагмента
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Отмена регистрации слушателя шагов при приостановке фрагмента
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-        }
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            // Получение текущего количества шагов с сенсора
-            totalSteps = (int) event.values[0];
-            updateUIForCurrentSteps(); // Обновление UI для текущих шагов (без графика)
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Метод не используется
-    }
-
-    // Обновление UI для отображения текущих шагов и прогресса (без графика)
-    private void updateUIForCurrentSteps() {
-        stepsCountTextView.setText(String.valueOf(totalSteps)); // Обновление текста текущих шагов
-        int progress = (int) ((totalSteps * 100f) / goalSteps); // Вычисление прогресса в процентах
-        progressCircle.setProgress(progress); // Обновление прогресс-бара
-    }
 
     // Настройка столбчатой диаграммы (оси, легенда, описание)
     private void setupBarChart() {
@@ -233,16 +188,25 @@ public class StepsFragment extends Fragment implements SensorEventListener, OnCh
     public void onValueSelected(Entry e, Highlight h) {
         int index = (int) e.getX();
         if (stepsDataList != null && index < stepsDataList.size()) {
-            int steps = stepsDataList.get(index);
-            String[] daysOfWeek = getDaysOfWeek();
-            todayTextView.setText(daysOfWeek[index]); // Обновление TextView с выбранным днем
-            stepsCountTextView.setText(String.valueOf(steps)); // Обновление TextView с шагами за выбранный день
-            int progress = (int) ((steps * 100f) / goalSteps);
-            progressCircle.setProgress(progress); // Обновление прогресс бара для выбранного дня
+            updateUIForDay(stepsDataList.get(index), index);
         } else {
             Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или данные не загружены.");
             showError("Ошибка при выборе данных на графике.");
         }
+    }
+
+    // Обновление UI для отображения шагов и прогресса для выбранного дня
+    private void updateUIForDay(int steps, int dayIndex) {
+        stepsCountTextView.setText(String.valueOf(steps)); // Обновление текста текущих шагов
+        int progress = (int) ((steps * 100f) / goalSteps); // Вычисление прогресса в процентах
+        progressCircle.setProgress(progress); // Обновление прогресс-бара
+        String[] daysOfWeek = getDaysOfWeek();
+        todayTextView.setText(daysOfWeek[dayIndex]); // Обновление TextView с выбранным днем
+    }
+
+    // Перегрузка метода для обновления UI для текущего дня (без индекса, используется при загрузке данных)
+    private void updateUIForDay(int steps) {
+        updateUIForDay(steps, getCurrentDayIndex());
     }
 
 
@@ -260,5 +224,13 @@ public class StepsFragment extends Fragment implements SensorEventListener, OnCh
     @Override
     public CreationExtras getDefaultViewModelCreationExtras() {
         return super.getDefaultViewModelCreationExtras();
+    }
+
+    private int getCurrentDayIndex() {
+        int dayIndex = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2; // Понедельник - 0, Воскресенье - 6
+        if (dayIndex == -1) {
+            dayIndex = 6; // Воскресенье
+        }
+        return dayIndex;
     }
 }

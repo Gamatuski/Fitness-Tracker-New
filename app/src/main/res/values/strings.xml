@@ -2,4 +2,6 @@
     <string name="app_name">FitnessTracker</string>
     <string name="plus_button">Увеличить время</string>
     <string name="minus_button">Уменьшить время</string>
+
+
 </resources>

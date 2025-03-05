@@ -3,6 +3,8 @@ package com.example.fitnesstracker.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
@@ -18,12 +20,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.example.fitnesstracker.R;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.LoginRequest;
 import com.example.fitnesstracker.models.LoginResponse;
+import com.example.fitnesstracker.service.StepCounterService;
 import com.example.fitnesstracker.utils.StyleTitleText;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -86,6 +90,8 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+
+
     }
 
     private void setupFocusListeners() {
@@ -129,10 +135,23 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("userId", userId); // Ключ "userId", значение - полученный userId
                         editor.apply(); // или editor.commit(); - 'apply' работает асинхронно, 'commit' синхронно
 
-
                         startActivity(intent);
                         Toast.makeText(LoginActivity.this, "Вход выполнен", Toast.LENGTH_SHORT).show();
                         resetErrorUI(); // Сброс ошибок
+
+                        // **Проверка наличия датчика перед запуском службы**
+                        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+                        Sensor stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+                        if (stepCounterSensor != null) {
+                            // Датчик шагомера найден, запускаем службу
+                            Intent serviceIntent = new Intent(LoginActivity.this, StepCounterService.class);
+                            ContextCompat.startForegroundService(LoginActivity.this, serviceIntent);
+                        } else {
+                            // Датчик шагомера не найден, не запускаем службу и сообщаем пользователю
+                            Toast.makeText(LoginActivity.this, "Отслеживание шагов не поддерживается на этом устройстве.", Toast.LENGTH_LONG).show();
+                            Log.w("LoginActivity", "Step Counter Sensor не найден на устройстве. Служба не запущена.");
+                        }
                     } else {
                         // Ошибка входа
                         showError("Неверный пароль");

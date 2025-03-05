@@ -1,5 +1,7 @@
 package com.example.fitnesstracker.api;
 
+import com.example.fitnesstracker.models.Activity;
+import com.example.fitnesstracker.models.ActivityRequest;
 import com.example.fitnesstracker.models.LoginRequest;
 import com.example.fitnesstracker.models.LoginResponse;
 import com.example.fitnesstracker.models.RegisterRequest;
@@ -10,12 +12,14 @@ import com.example.fitnesstracker.models.Workout;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface FitnessApi {
 
@@ -32,5 +36,21 @@ public interface FitnessApi {
 
     @GET("steps/{userId}")
     Call<StepsResponse> getSteps(@Path("userId") String userId);
+
+    @POST("steps/{userId}") // Используем POST для обновления шагов
+    Call<StepsResponse> updateSteps(
+            @Path("userId") String userId,
+            @Query("dayIndex") int dayIndex,
+            @Query("steps") int steps // Отправляем только одно значение шагов для обновления в нужный день
+    );
+
+    @POST("users/{userId}/activities")
+    Call<ResponseBody> addActivity(
+            @Path("userId") String userId,
+            @Body ActivityRequest activityRequest
+    );
+
+    @GET("users/{userId}/activities")
+    Call<List<Activity>> getActivities(@Path("userId") String userId);
 
 }

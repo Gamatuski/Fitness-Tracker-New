@@ -65,10 +65,13 @@ public class RegisterActivity extends AppCompatActivity {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
 
-            int height = Integer.parseInt(heightEditText.getText().toString());
-            int weight = Integer.parseInt(weightEditText.getText().toString());
+            String heightStr = heightEditText.getText().toString();
+            String weightStr = weightEditText.getText().toString();
 
-            if (validateInput(email, password, height, weight)) {
+            if (validateInput(email, password, heightStr, weightStr)) {
+                int height = Integer.parseInt(heightStr);
+                int weight = Integer.parseInt(weightStr);
+
                 registerUser(email, password, height, weight);
             }
         });
@@ -147,7 +150,9 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private boolean validateInput(String email, String password, int height, int weight) {
+    private boolean validateInput(String email, String password, String heightStr, String weightStr) {
+
+
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             showError("Введите корректный email");
             return false;
@@ -156,6 +161,16 @@ public class RegisterActivity extends AppCompatActivity {
             showError("Пароль должен содержать не менее 6 символов");
             return false;
         }
+
+        int weight,height;
+        try {
+            weight = Integer.parseInt(weightStr);
+            height = Integer.parseInt(heightStr);
+        } catch (NumberFormatException e) {
+            showError("Рост и вес не должны быть пустыми");
+            return false;
+        }
+
         if (height <= 0 || weight <= 0) {
             showError("Рост и вес должны быть положительными числами");
             return false;

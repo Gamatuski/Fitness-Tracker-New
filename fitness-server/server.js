@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema({
     height: { type: Number, required: true },
     weight: { type: Number, required: true },
     steps: { type: [Number], default: [0, 0, 0, 0, 0, 0, 0] },
+    activities: [{
+        action: { type: String, required: true },
+        distance: { type: Number, required: true },
+        calories: { type: Number, required: true },
+        steps: { type: Number, required: true },
+        duration: { type: Number, required: true },
+        date: { type: Date, default: Date.now }
+    }]
 });
 
 const User = mongoose.model('User', userSchema);
@@ -182,6 +190,42 @@ async function getMETValueForActivity(activityName) {
     }
 }
 
+
+app.post('/users/:userId/activities', async (req, res) => {
+    const { userId } = req.params;
+    const { action, distance, calories, steps, duration, date } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        user.activities.push({ action, distance, calories, steps, duration, date });
+        await user.save();
+
+        res.status(201).json({ success: true, message: 'Активность добавлена' });
+    } catch (err) {
+        console.error('Ошибка при добавлении активности:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
+app.get('/users/:userId/activities', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        res.status(200).json(user.activities);
+    } catch (err) {
+        console.error('Ошибка при получении активностей:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
 });
