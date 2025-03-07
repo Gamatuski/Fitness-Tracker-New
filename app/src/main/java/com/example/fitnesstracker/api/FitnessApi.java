@@ -2,6 +2,7 @@ package com.example.fitnesstracker.api;
 
 import com.example.fitnesstracker.models.Activity;
 import com.example.fitnesstracker.models.ActivityRequest;
+import com.example.fitnesstracker.models.DistanceResponse;
 import com.example.fitnesstracker.models.LoginRequest;
 import com.example.fitnesstracker.models.LoginResponse;
 import com.example.fitnesstracker.models.RegisterRequest;
@@ -36,6 +37,9 @@ public interface FitnessApi {
 
     @GET("steps/{userId}")
     Call<StepsResponse> getSteps(@Path("userId") String userId);
+
+    @GET("distance/{userId}")
+    Call<DistanceResponse> getDistance(@Path("userId") String userId);
 
     @POST("steps/{userId}") // Используем POST для обновления шагов
     Call<StepsResponse> updateSteps(

@@ -150,6 +150,43 @@ app.post('/steps/:userId', async (req, res) => {
     }
 });
 
+app.get('/distance/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        res.status(200).json({ success: true, distance: user.distance });
+    } catch (err) {
+        console.error('Error getting distance:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
+app.post('/distance/:userId', async (req, res) => {
+    const { userId } = req.params;
+    const { distance, dayIndex } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        user.distance[dayIndex] = distance;
+        await user.save();
+
+        res.status(200).json({ success: true, distance: user.distance });
+    } catch (err) {
+        console.error('Error updating distance:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
+
 app.post('/workouts', async (req, res) => {
     const { userId, action, distance, duration, calories, steps } = req.body;
 

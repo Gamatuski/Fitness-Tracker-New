@@ -11,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="4dp"
-
         android:text="Fitness Tracker"
         android:textSize="24sp"
         android:textStyle="bold" />
@@ -22,7 +21,7 @@
         android:layout_height="350dp"
         android:layout_gravity="center">
 
-        <!--progress bar implementation-->
+        <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progressCircle"
             style="?android:attr/progressBarStyleHorizontal"
@@ -33,10 +32,7 @@
             android:progressDrawable="@drawable/circular_progress_bar"
             android:textAlignment="center" />
 
-        <!--Text implementation in center of the progress bar-->
-
         <!-- Иконка шагов -->
-
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -44,7 +40,6 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_gravity="center"
-
             android:layout_marginBottom="8dp"
             android:src="@drawable/ic_steps" />
 
@@ -81,21 +76,95 @@
             android:layout_alignBottom="@+id/stepsCountTextView"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-
             android:layout_marginBottom="-39dp"
             android:gravity="center"
             android:text="Цель: 5000"
             android:textColor="@color/gray"
             android:textSize="14sp" />
-
     </RelativeLayout>
 
+    <!-- Иконки для переключения между шагами и расстоянием -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
+        <!-- Иконка шагов -->
+        <LinearLayout
+            android:id="@+id/stepsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/stepsIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_steps"
+                android:tint="@color/purpule"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Шаги"
+                android:textColor="@color/purpule"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <!-- Подчеркивание для выбранной иконки -->
+            <View
+                android:id="@+id/stepsUnderline"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/purpule"
+                android:visibility="visible"/>
+        </LinearLayout>
+
+        <!-- Иконка расстояния -->
+        <LinearLayout
+            android:id="@+id/distanceLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_marginLeft="32dp">
+
+            <ImageView
+                android:id="@+id/distanceIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/distance_ic"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Расстояние"
+                android:textColor="@color/gray"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <!-- Подчеркивание для выбранной иконки -->
+            <View
+                android:id="@+id/distanceUnderline"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/purpule"
+                android:visibility="invisible"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- BarChart -->
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/edittext_background"
-        />
-
+        android:background="@drawable/edittext_background"/>
 </LinearLayout>
