@@ -3,6 +3,7 @@ package com.example.fitnesstracker.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +11,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitnesstracker.R;
 import com.example.fitnesstracker.activities.AddTrainingActivity;
+import com.example.fitnesstracker.adapters.SwipeToDeleteCallback;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.Activity;
@@ -54,6 +58,13 @@ public class ProgressFragment extends Fragment {
             Intent intent = new Intent(getActivity(), AddTrainingActivity.class);
             startActivity(intent);
         });
+
+        // Иконка для удаления (если нужно)
+        Drawable deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete);
+
+        // Привязываем ItemTouchHelper
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(activitiesAdapter, deleteIcon));
+        itemTouchHelper.attachToRecyclerView(activitiesRecyclerView);
 
         // Загрузка данных
         loadActivities();
@@ -111,11 +122,16 @@ public class ProgressFragment extends Fragment {
 
 
 
-    private static class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolder> {
+    public static class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolder> {
         private List<Activity> activities;
 
         public ActivitiesAdapter(List<Activity> activities) {
             this.activities = activities;
+        }
+
+        public void deleteItem(int position) {
+            activities.remove(position);
+            notifyItemRemoved(position); // Уведомляем адаптер об удалении
         }
 
         @Override

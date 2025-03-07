@@ -82,6 +82,7 @@ dependencies {
     implementation libs.mpandroidchart
 
     implementation libs.okhttp3.logging.interceptor.v4120
+    implementation libs.androidx.recyclerview
 }
 
 configurations {

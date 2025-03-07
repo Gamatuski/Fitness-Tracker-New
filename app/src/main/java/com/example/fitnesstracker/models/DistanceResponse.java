@@ -7,11 +7,12 @@ import java.util.List;
 public class DistanceResponse {
     @SerializedName("success")
     private boolean success;
-    @SerializedName("steps")
+
+    @SerializedName("distance") // Убедитесь, что имя поля совпадает с JSON
     private List<Double> distance;
+
     @SerializedName("message")
     private String message;
-
 
     public boolean isSuccess() {
         return success;

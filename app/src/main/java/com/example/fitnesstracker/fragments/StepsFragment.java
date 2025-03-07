@@ -108,9 +108,10 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
 
         // Изменение цвета иконок и подчеркивания
         stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.purpule));
-        distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yellow));
+        distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
         stepsUnderline.setVisibility(View.VISIBLE);
         distanceUnderline.setVisibility(View.INVISIBLE);
+        progressCircle.setBackgroundColor(getResources().getColor(R.color.purpule));
 
         // Обновление данных (шаги)
         loadStepsDataFromDatabase();
@@ -121,10 +122,11 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         isShowingSteps = false;
 
         // Изменение цвета иконок и подчеркивания
-        stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.purpule));
+        stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yellow));
         stepsUnderline.setVisibility(View.INVISIBLE);
         distanceUnderline.setVisibility(View.VISIBLE);
+        progressCircle.setBackgroundColor(getResources().getColor(R.color.yellow));
 
         // Обновление данных (расстояние)
         loadDistanceDataFromDatabase();
@@ -154,7 +156,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                     if (stepsResponse.isSuccess()) {
                         stepsDataList = stepsResponse.getSteps();
                         if (stepsDataList != null && stepsDataList.size() == 7) {
-                            updateBarChart(stepsDataList, true); // Передаём true для шагов
+                            updateBarChart(convertIntegerToDouble(stepsDataList), true);
                             updateUIForDay(stepsDataList.get(getCurrentDayIndex()));
                         } else {
                             showError("Неверный формат данных о шагах с сервера.");
@@ -204,10 +206,10 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                     if (distanceResponse.isSuccess()) {
                         List<Double> distanceData = distanceResponse.getDistance();
                         if (distanceData != null && distanceData.size() == 7) {
-                            updateBarChart(convertDistanceToInt(distanceData), false); // Передаём false для расстояния
+                            updateBarChart(distanceData, false); // Передаём false для расстояния
                             updateUIForDistance(distanceData.get(getCurrentDayIndex()));
                         } else {
-                            showError("Неверный формат данных о расстоянии с сервера.");
+                            showError("Неверный формат данных о расстоянии с сервера."+ distanceData);
                         }
                     } else {
                         showError(distanceResponse.getMessage() != null ? distanceResponse.getMessage() : "Ошибка при получении данных о расстоянии.");
@@ -235,13 +237,13 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         });
     }
 
-    // Преобразование List<Double> в List<Integer> для BarChart
-    private List<Integer> convertDistanceToInt(List<Double> distanceData) {
-        List<Integer> intData = new ArrayList<>();
-        for (Double d : distanceData) {
-            intData.add(d.intValue());
+
+    private List<Double> convertIntegerToDouble(List<Integer> intList) {
+        List<Double> doubleList = new ArrayList<>();
+        for (Integer value : intList) {
+            doubleList.add(value.doubleValue());
         }
-        return intData;
+        return doubleList;
     }
 
     // Обновление UI для отображения расстояния
@@ -263,33 +265,38 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         barChart.getDescription().setEnabled(false); // Отключение описания
         barChart.setDrawGridBackground(false); // Отключение фоновой сетки (если есть фон)
 
-        // Настройка оси X
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false); // Отключение вертикальных линий сетки оси X
-        xAxis.setGranularity(1f);
-        xAxis.setLabelCount(7); // 7 дней
+        xAxis.setDrawGridLines(false); // Отключение линий сетки
+        xAxis.setGranularity(1f); // Шаг оси X
+        xAxis.setLabelCount(7); // Количество меток (7 дней)
         xAxis.setValueFormatter(new IndexAxisValueFormatter(getDaysOfWeek())); // Подписи дней недели
+        xAxis.setDrawGridLines(false);
 
-        // Настройка оси Y
         YAxis yAxis = barChart.getAxisLeft();
         yAxis.setAxisMinimum(0f); // Минимальное значение
-        yAxis.setAxisMaximum(10000f); // Максимальное значение (можно изменить)
+        yAxis.setAxisMaximum(10000f); // Максимальное значение (можно изменить в зависимости от данных)
         yAxis.setGranularity(1000f); // Шаг оси Y
-        yAxis.setDrawLabels(false); // Отключение подписей оси Y (справа)
-        yAxis.setDrawGridLines(false); // **Добавлено: Отключение горизонтальных линий сетки оси Y**
+        yAxis.setDrawLabels(true); // Включение подписей оси Y
+        yAxis.setDrawGridLines(false); // Отключаем сетку оси Y
         barChart.getAxisRight().setEnabled(false); // Отключение правой оси Y
+
 
         // Настройка легенды
         barChart.getLegend().setEnabled(false); // Отключение легенды
     }
 
     // Обновление данных столбчатой диаграммы
-    private void updateBarChart(List<Integer> data, boolean isSteps) {
+    private void updateBarChart(List<Double> data, boolean isSteps) {
         List<BarEntry> entries = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
-            entries.add(new BarEntry(i, data.get(i)));
+            entries.add(new BarEntry(i, data.get(i).floatValue()));
         }
+
+        // Set dynamic Y-axis maximum
+        float maxY = getMaxValue(data);
+        YAxis yAxis = barChart.getAxisLeft();
+        yAxis.setAxisMaximum(maxY);
 
         BarDataSet dataSet = new BarDataSet(entries, isSteps ? "Шаги" : "Расстояние");
         dataSet.setColor(ContextCompat.getColor(requireContext(), isSteps ? R.color.purpule : R.color.yellow));
@@ -300,6 +307,17 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         barData.setBarWidth(0.5f);
         barChart.setData(barData);
         barChart.invalidate();
+    }
+
+    private float getMaxValue(List<Double> data) {
+        float maxValue = 0f;
+        for (Double value : data) {
+            if (value > maxValue) {
+                maxValue = value.floatValue();
+            }
+        }
+        // Add 20% padding to the max value for better visualization
+        return maxValue * 1.2f;
     }
 
     // Получение массива подписей дней недели для оси X графика
