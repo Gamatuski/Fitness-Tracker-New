@@ -19,6 +19,11 @@ import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.ActivityRequest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,6 +34,8 @@ public class AddTrainingActivity extends AppCompatActivity {
     private TextView cancelTextView, saveTextView;
     private EditText  distanceEditText, caloriesEditText, stepsEditText, durationEditText, startDateEditText;
     private Spinner actionSpinner;
+    private boolean isFormatting;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,23 +60,53 @@ public class AddTrainingActivity extends AppCompatActivity {
         caloriesEditText = findViewById(R.id.caloriesEditText);
         stepsEditText = findViewById(R.id.stepsEditText);
         durationEditText = findViewById(R.id.durationEditText);
+
+        // Получаем текущую дату
+        LocalDate date = LocalDate.now();
+
+        // Форматируем дату в строку
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+        // Устанавливаем текст в поле редактирования
+        startDateEditText.setText(formattedDate);
+
         startDateEditText = findViewById(R.id.startDateEditText);
 
         // Добавление TextWatcher для автоматического форматирования даты
         startDateEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Форматирование текста
-                if (s.length() == 2 && before == 1) {
-                    startDateEditText.setText(s + ".");
-                    startDateEditText.setSelection(s.length() + 1);
-                } else if (s.length() == 5 && before == 4) {
-                    startDateEditText.setText(s + ".");
-                    startDateEditText.setSelection(s.length() + 1);
+
+
+                if (isFormatting) return;
+
+                String input = s.toString();
+                StringBuilder formatted = new StringBuilder();
+
+                // Удаляем все символы, кроме цифр
+                String digitsOnly = input.replaceAll("[^\\d]", "");
+
+                for (int i = 0; i < digitsOnly.length(); i++) {
+                    if (i == 2 || i == 4) {
+                        formatted.append("."); // Добавляем точку после дня и месяца
+                    }
+                    formatted.append(digitsOnly.charAt(i));
                 }
+
+                // Обрезаем лишние символы, если длина больше 10 (ДД.ММ.ГГГГ)
+                if (formatted.length() > 10) {
+                    formatted.setLength(10);
+                }
+
+                isFormatting = true;
+                startDateEditText.setText(formatted.toString());
+                startDateEditText.setSelection(formatted.length()); // Устанавливаем курсор в конец
+                isFormatting = false;
             }
 
             @Override

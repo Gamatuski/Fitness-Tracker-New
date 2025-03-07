@@ -12,13 +12,16 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@id/registerCard"
+        android:layout_alignParentEnd="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="32dp"
+        android:layout_marginEnd="120dp"
         android:layout_marginBottom="32dp"
+
+        android:elevation="4dp"
         android:text="Fitness Tracker"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:elevation="4dp"/>
+        android:textStyle="bold" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/registerCard"

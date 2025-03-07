@@ -2,6 +2,8 @@ package com.example.fitnesstracker.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class User {
     @SerializedName("_id") // Указываем соответствие JSON полю "_id"
     private String id; // Поле для хранения ID пользователя
@@ -10,6 +12,7 @@ public class User {
     private String password; // Внимание: пароль не должен передаваться обратно с сервера в production
     private int height;
     private int weight;
+    private List<Double> distance;
 
 
     // Конструктор по умолчанию (необходим для Gson)
@@ -67,4 +70,6 @@ public class User {
     public void setWeight(int weight) {
         this.weight = weight;
     }
+
+
 }

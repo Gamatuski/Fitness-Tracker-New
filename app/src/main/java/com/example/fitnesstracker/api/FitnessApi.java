@@ -53,4 +53,10 @@ public interface FitnessApi {
     @GET("users/{userId}/activities")
     Call<List<Activity>> getActivities(@Path("userId") String userId);
 
+    @GET("activities/{action}")
+    Call<Activity> getActivityByName(@Path("activityName") String activityName);
+
+    @GET("users/{userId}")
+    Call<User> getUser(@Path("userId") String userId);
+
 }

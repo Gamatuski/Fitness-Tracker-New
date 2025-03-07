@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
     height: { type: Number, required: true },
     weight: { type: Number, required: true },
     steps: { type: [Number], default: [0, 0, 0, 0, 0, 0, 0] },
+    distance: { type: [Number], default: [0, 0, 0, 0, 0, 0, 0] },
     activities: [{
         action: { type: String, required: true },
         distance: { type: Number, required: true },
@@ -202,6 +203,11 @@ app.post('/users/:userId/activities', async (req, res) => {
         }
 
         user.activities.push({ action, distance, calories, steps, duration, date });
+
+        // Обновление массива расстояний
+        const currentDayOfWeek = new Date(date).getDay(); // Получаем день недели (0 - воскресенье, 1 - понедельник и т.д.)
+        user.distance[currentDayOfWeek] += distance; // Добавляем пройденное расстояние к соответствующему дню
+
         await user.save();
 
         res.status(201).json({ success: true, message: 'Активность добавлена' });
@@ -226,6 +232,23 @@ app.get('/users/:userId/activities', async (req, res) => {
         res.status(500).json({ success: false, message: 'Ошибка сервера' });
     }
 });
+
+app.get('/activities/:action', async (req, res) => {
+    const { activityName } = req.params;
+
+    try {
+        const activity = await Activity.findOne({ activityName });
+        if (activity) {
+            res.status(200).json(activity);
+        } else {
+            res.status(404).json({ success: false, message: 'Активность не найдена' });
+        }
+    } catch (err) {
+        console.error('Ошибка при получении активности:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
 });

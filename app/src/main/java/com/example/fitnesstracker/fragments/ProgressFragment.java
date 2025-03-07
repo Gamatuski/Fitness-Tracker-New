@@ -21,7 +21,9 @@ import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,6 +35,7 @@ public class ProgressFragment extends Fragment {
     private RecyclerView activitiesRecyclerView;
     private ActivitiesAdapter activitiesAdapter;
     private FloatingActionButton addTrainingButton;
+    private Call<List<Activity>> call; // Объе
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,7 +70,7 @@ public class ProgressFragment extends Fragment {
         }
 
         FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
-        Call<List<Activity>> call = api.getActivities(userId);
+        call = api.getActivities(userId);
         call.enqueue(new Callback<List<Activity>>() {
             @Override
             public void onResponse(Call<List<Activity>> call, Response<List<Activity>> response) {
@@ -81,10 +84,32 @@ public class ProgressFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Activity>> call, Throwable t) {
-                Toast.makeText(getContext(), "Ошибка сети", Toast.LENGTH_SHORT).show();
+                if (!call.isCanceled()) { // Проверяем, что запрос не был отменён
+                    showError("Ошибка сети");
+                }
             }
+
+
         });
+
+
     }
+    private void showError(String message) {
+        if (getContext() != null) { // Проверяем, что контекст не null
+            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Отменяем все запросы к API
+        if (call != null) {
+            call.cancel();
+        }
+    }
+
+
 
     private static class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolder> {
         private List<Activity> activities;
@@ -106,7 +131,17 @@ public class ProgressFragment extends Fragment {
             holder.durationTextView.setText(activity.getDuration() + " мин");
             holder.distanceTextView.setText(activity.getDistance() + " км");
             holder.caloriesTextView.setText(activity.getCalories() + " ккал");
-            holder.dateTextView.setText(activity.getDate().toString()); // Форматируйте дату по необходимости
+
+            // Получаем текущую дату
+            Date date = activity.getDate();
+
+            // Создаем форматтер для даты
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+            // Преобразуем дату в строку в нужном формате
+            String formattedDate = dateFormat.format(date);
+
+            holder.dateTextView.setText(formattedDate);
         }
 
         @Override

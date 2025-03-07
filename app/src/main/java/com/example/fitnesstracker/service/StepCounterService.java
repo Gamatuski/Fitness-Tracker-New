@@ -42,6 +42,9 @@ public class StepCounterService extends Service implements SensorEventListener {
     private int previousDayOfWeek = -1; // Для отслеживания смены дня
     private String userId;
 
+    private int stepsDuringTimer = 0; // Шаги, сделанные за время таймера
+    private boolean isTimerRunning = false; // Флаг, указывающий, что таймер запущен
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -106,6 +109,10 @@ public class StepCounterService extends Service implements SensorEventListener {
             int stepsTaken = currentSteps - stepCount; // Шаги, сделанные с момента запуска службы
             stepCount = currentSteps; // Обновление общего количества шагов
 
+            if (isTimerRunning) {
+                stepsDuringTimer += stepsTaken; // Учитываем шаги только во время работы таймера
+            }
+
             int currentDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2; // Понедельник - 0, Воскресенье - 6
             if (currentDayOfWeek == -1) {
                 currentDayOfWeek = 6; // Воскресенье
@@ -124,6 +131,18 @@ public class StepCounterService extends Service implements SensorEventListener {
             // Обновление шагов в базе данных
             updateStepsToDatabase(stepsTaken, currentDayOfWeek);
         }
+    }
+
+    // Метод для запуска отслеживания шагов во время таймера
+    public void startTrackingStepsForTimer() {
+        stepsDuringTimer = 0; // Сбрасываем счётчик шагов
+        isTimerRunning = true; // Указываем, что таймер запущен
+    }
+
+    // Метод для остановки отслеживания шагов и возврата пройденных шагов
+    public int stopTrackingStepsForTimer() {
+        isTimerRunning = false; // Останавливаем отслеживание
+        return stepsDuringTimer; // Возвращаем количество шагов за время таймера
     }
 
     private void updateStepsToDatabase(int steps, int dayIndex) {
