@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +48,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView registerTextView, titleTextView, errorTextView;;
     private CardView loginCard;
 
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,8 @@ public class LoginActivity extends AppCompatActivity {
         titleTextView = findViewById(R.id.titleTextView);
         errorTextView = findViewById(R.id.errorTextView);
 
+        progressBar = findViewById(R.id.progressBar);
+
         // Стилизация заголовка
         StyleTitleText styleTitleText = new StyleTitleText();
         styleTitleText.styleTitleText(titleTextView);
@@ -70,6 +75,11 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
+
+            progressBar.setVisibility(View.VISIBLE); // Показываем ProgressBar
+            loginButton.setEnabled(false); // Отключаем кнопку
+            loginButton.setBackgroundColor(Color.GRAY);
+
             login(email, password);
         });
 
@@ -124,6 +134,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     LoginResponse loginResponse = response.body();
                     if (loginResponse != null && loginResponse.isSuccess()) {
+
+                        // После получения ответа от сервера:
+                        runOnUiThread(() -> {
+                            progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
+                            loginButton.setEnabled(true); // Включаем кнопку
+                            loginButton.setBackgroundColor(Color.MAGENTA);
+                        });
+
                         // Успешный вход
                         Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
 
@@ -155,6 +173,8 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         // Ошибка входа
                         showError("Неверный пароль");
+                        // После получения ответа от сервера:
+
                     }
                 } else {
                     // Ошибка сервера (например, 400 Bad Request)
@@ -169,6 +189,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         // Показываем сообщение об ошибке
                         showError(errorMessage);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                         showError("Ошибка при обработке ответа сервера");
@@ -180,6 +201,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 // Ошибка сети
                 Log.e("LoginActivity", "Ошибка сети: " + t.getMessage());
+
+                // После получения ответа от сервера:
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
+                    loginButton.setEnabled(true); // Включаем кнопку
+                    loginButton.setBackgroundColor(Color.MAGENTA);
+                });
+
                 showError("Ошибка сети");
             }
         });
@@ -195,6 +224,13 @@ public class LoginActivity extends AppCompatActivity {
 
         // Красная обводка для карточки
         loginCard.setCardBackgroundColor(Color.parseColor("#FFF0F0")); // Светло-красный фон
+
+        // После получения ответа от сервера:
+        runOnUiThread(() -> {
+            progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
+            loginButton.setEnabled(true); // Включаем кнопку
+            loginButton.setBackgroundColor(Color.MAGENTA);
+        });
     }
 
     private void resetErrorUI() {

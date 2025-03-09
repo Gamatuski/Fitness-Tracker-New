@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private CardView registerCard;
     private TextView titleTextView, errorTextView;
+    private ProgressBar progressBar;
 
 
     @Override
@@ -55,6 +57,8 @@ public class RegisterActivity extends AppCompatActivity {
         titleTextView = findViewById(R.id.titleTextView);
         errorTextView = findViewById(R.id.errorTextView);
 
+        progressBar = findViewById(R.id.progressBar);
+
         // Стилизация заголовка
         StyleTitleText styleTitleText = new StyleTitleText();
         styleTitleText.styleTitleText(titleTextView);
@@ -62,6 +66,8 @@ public class RegisterActivity extends AppCompatActivity {
         setupFocusListeners();
 
         registerButton.setOnClickListener(v -> {
+
+
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
 
@@ -71,6 +77,10 @@ public class RegisterActivity extends AppCompatActivity {
             if (validateInput(email, password, heightStr, weightStr)) {
                 int height = Integer.parseInt(heightStr);
                 int weight = Integer.parseInt(weightStr);
+
+                progressBar.setVisibility(View.VISIBLE); // Показываем ProgressBar
+                registerButton.setEnabled(false); // Отключаем кнопку
+                registerButton.setBackgroundColor(Color.GRAY);
 
                 registerUser(email, password, height, weight);
             }
@@ -109,6 +119,13 @@ public class RegisterActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     RegisterResponse registerResponse = response.body();
                     if (registerResponse != null && registerResponse.isSuccess()) {
+
+                        // После получения ответа от сервера:
+                        runOnUiThread(() -> {
+                            progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
+                            registerButton.setEnabled(true); // Включаем кнопку
+                            registerButton.setBackgroundColor(Color.MAGENTA);
+                        });
                         // Успешная регистрация
                         Toast.makeText(RegisterActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
                         Log.d("RegisterActivity", "Response Success: " + new Gson().toJson(registerResponse)); // Log full success response
@@ -120,6 +137,7 @@ public class RegisterActivity extends AppCompatActivity {
                         // Ошибка регистрации
                         showError(registerResponse != null ? registerResponse.getMessage() : "Ошибка регистрации");
                         Log.d("RegisterActivity", "Response Code: " + response.code()); // Log response code
+
                     }
                 } else {
                     // Ошибка сервера (например, 400 Bad Request)
@@ -143,6 +161,12 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
+
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
+                    registerButton.setEnabled(true); // Включаем кнопку
+                    registerButton.setBackgroundColor(Color.MAGENTA);
+                });
                 // Ошибка сети
                 Log.e("RegisterActivity", "Ошибка сети: " + t.getMessage());
                 showError("Ошибка сети");
@@ -185,6 +209,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Красная обводка для карточки
         registerCard.setCardBackgroundColor(Color.parseColor("#FFF0F0")); // Светло-красный фон
+        // После получения ответа от сервера:
+        runOnUiThread(() -> {
+            progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
+            registerButton.setEnabled(true); // Включаем кнопку
+            registerButton.setBackgroundColor(Color.MAGENTA);
+        });
     }
 
     private void resetErrorUI() {

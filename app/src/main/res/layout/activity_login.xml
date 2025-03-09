@@ -16,7 +16,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginEnd="120dp"
         android:layout_marginBottom="32dp"
-
         android:elevation="4dp"
         android:text="Fitness Tracker"
         android:textSize="24sp"
@@ -31,66 +30,76 @@
         app:cardCornerRadius="12dp"
         android:layout_margin="16dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="wrap_content">
 
-            <!-- Поле для ввода email -->
-            <EditText
-                android:id="@+id/emailEditText"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
-                android:inputType="textEmailAddress"
-                android:padding="12dp"
-                android:background="@drawable/edittext_background"
-                android:layout_marginBottom="16dp"/>
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <!-- Поле для ввода пароля -->
-            <EditText
-                android:id="@+id/passwordEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:padding="12dp"
-                android:background="@drawable/edittext_background"
-                android:layout_marginBottom="16dp"/>
+                <EditText
+                    android:id="@+id/emailEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:padding="12dp"
+                    android:background="@drawable/edittext_background"
+                    android:layout_marginBottom="16dp"/>
 
+                <EditText
+                    android:id="@+id/passwordEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:background="@drawable/edittext_background"
+                    android:layout_marginBottom="16dp"/>
 
-            <!-- Текст ошибки -->
-            <TextView
-                android:id="@+id/errorTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/red"
-                android:textSize="14sp"
-                android:visibility="gone"
-                android:layout_marginBottom="16dp"/>
+                <TextView
+                    android:id="@+id/errorTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/red"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp"/>
 
-            <!-- Кнопка входа -->
-            <Button
-                android:id="@+id/loginButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Вход"
-                android:backgroundTint="@color/purpule"
-                android:textColor="@color/white"
-                android:padding="12dp"/>
-            <!-- Текст для регистрации -->
-            <TextView
-                android:id="@+id/registerTextView"
+                <Button
+                    android:id="@+id/loginButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Вход"
+                    android:backgroundTint="@color/purpule"
+                    android:textColor="@color/white"
+                    android:padding="12dp"/>
+
+                <TextView
+                    android:id="@+id/registerTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Регистрация"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Регистрация"
-                android:textColor="@color/gray"
-                android:textSize="14sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="4dp"/>
-        </LinearLayout>
+                android:layout_centerInParent="true"
+                android:visibility="gone"
+                android:indeterminateTint="@color/purpule"/>
+
+        </RelativeLayout>
+
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

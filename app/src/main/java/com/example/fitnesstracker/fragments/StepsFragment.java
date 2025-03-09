@@ -2,6 +2,7 @@ package com.example.fitnesstracker.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +50,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
     private TextView stepsCountTextView, todayTextView;
     private BarChart barChart;
     private List<Integer> stepsDataList = new ArrayList<>(); // Список для хранения данных о шагах из БД (для графика)
+    private List<Double> distanceData = new ArrayList<>(); // Список для хранения данных о растоянии из БД (для графика)
     private int goalSteps = 5000; // Цель шагов
 
     private LinearLayout stepsLayout, distanceLayout;
@@ -111,7 +113,10 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
         stepsUnderline.setVisibility(View.VISIBLE);
         distanceUnderline.setVisibility(View.INVISIBLE);
-        progressCircle.setBackgroundColor(getResources().getColor(R.color.purpule));
+        progressCircle.getIndeterminateDrawable().setColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.purpule),
+                android.graphics.PorterDuff.Mode.SRC_IN
+        );
 
         // Обновление данных (шаги)
         loadStepsDataFromDatabase();
@@ -126,7 +131,10 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yellow));
         stepsUnderline.setVisibility(View.INVISIBLE);
         distanceUnderline.setVisibility(View.VISIBLE);
-        progressCircle.setBackgroundColor(getResources().getColor(R.color.yellow));
+        progressCircle.getIndeterminateDrawable().setColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.yellow),
+                android.graphics.PorterDuff.Mode.SRC_IN
+        );
 
         // Обновление данных (расстояние)
         loadDistanceDataFromDatabase();
@@ -204,12 +212,12 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                 if (response.isSuccessful() && response.body() != null) {
                     DistanceResponse distanceResponse = response.body();
                     if (distanceResponse.isSuccess()) {
-                        List<Double> distanceData = distanceResponse.getDistance();
+                        distanceData = distanceResponse.getDistance(); // Сохраняем данные о расстоянии
                         if (distanceData != null && distanceData.size() == 7) {
                             updateBarChart(distanceData, false); // Передаём false для расстояния
                             updateUIForDistance(distanceData.get(getCurrentDayIndex()));
                         } else {
-                            showError("Неверный формат данных о расстоянии с сервера."+ distanceData);
+                            showError("Неверный формат данных о расстоянии с сервера.");
                         }
                     } else {
                         showError(distanceResponse.getMessage() != null ? distanceResponse.getMessage() : "Ошибка при получении данных о расстоянии.");
@@ -227,7 +235,6 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                     showError(message);
                 }
             }
-
 
             @Override
             public void onFailure(Call<DistanceResponse> call, Throwable t) {
@@ -329,11 +336,23 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
     @Override
     public void onValueSelected(Entry e, Highlight h) {
         int index = (int) e.getX();
-        if (stepsDataList != null && index < stepsDataList.size()) {
-            updateUIForDay(stepsDataList.get(index), index);
+
+        if (isShowingSteps) {
+            // Если отображаются шаги, используем stepsDataList
+            if (stepsDataList != null && index < stepsDataList.size()) {
+                updateUIForDay(stepsDataList.get(index), index);
+            } else {
+                Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или данные не загружены.");
+                showError("Ошибка при выборе данных на графике.");
+            }
         } else {
-            Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или данные не загружены.");
-            showError("Ошибка при выборе данных на графике.");
+            // Если отображается расстояние, используем distanceData
+            if (distanceData != null && index < distanceData.size()) {
+                updateUIForDistance(distanceData.get(index));
+            } else {
+                Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или данные не загружены.");
+                showError("Ошибка при выборе данных на графике.");
+            }
         }
     }
 

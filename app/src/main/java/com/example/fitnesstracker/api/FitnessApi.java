@@ -16,6 +16,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -62,5 +63,17 @@ public interface FitnessApi {
 
     @GET("users/{userId}")
     Call<User> getUser(@Path("userId") String userId);
+
+    @DELETE("users/{userId}/activities/{activityId}")
+    Call<ResponseBody> deleteActivity(
+            @Path("userId") String userId,
+            @Path("activityId") String activityId
+    );
+
+    @GET("steps/{userId}")
+    Call<StepsResponse> getWeeklySteps(@Path("userId") String userId);
+
+    @GET("distance/{userId}")
+    Call<DistanceResponse> getWeeklyDistance(@Path("userId") String userId);
 
 }

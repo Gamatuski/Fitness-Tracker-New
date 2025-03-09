@@ -3,6 +3,7 @@ package com.example.fitnesstracker.models;
 import java.util.Date;
 
 public class Activity {
+    private String id;
     private String action;
     private double distance;
     private int calories;
@@ -11,6 +12,14 @@ public class Activity {
     private Date date;
 
     // Геттеры и сеттеры
+
+    public String getId() { // Геттер для ID
+        return id;
+    }
+
+    public void setId(String id) { // Сеттер для ID
+        this.id = id;
+    }
 
 
     public String getAction() {

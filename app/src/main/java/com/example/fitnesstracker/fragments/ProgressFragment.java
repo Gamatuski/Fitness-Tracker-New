@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,7 +51,7 @@ public class ProgressFragment extends Fragment {
 
 
         // Инициализация адаптера с пустым списком
-        activitiesAdapter = new ActivitiesAdapter(new ArrayList<>());
+        activitiesAdapter = new ActivitiesAdapter(new ArrayList<>(),requireContext());
         activitiesRecyclerView.setAdapter(activitiesAdapter); // Устанавл
 
         addTrainingButton = view.findViewById(R.id.addTrainingButton);
@@ -124,14 +125,47 @@ public class ProgressFragment extends Fragment {
 
     public static class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolder> {
         private List<Activity> activities;
+        private Context context; // Добавляем контекст
 
-        public ActivitiesAdapter(List<Activity> activities) {
+        public ActivitiesAdapter(List<Activity> activities,Context context) {
             this.activities = activities;
+            this.context = context;
         }
 
+        private String getUserIdFromSharedPreferences() {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
+            return sharedPreferences.getString("userId", null);
+        }
+
+
         public void deleteItem(int position) {
-            activities.remove(position);
-            notifyItemRemoved(position); // Уведомляем адаптер об удалении
+            Activity activity = activities.get(position);
+            String userId = getUserIdFromSharedPreferences(); // Получите userId из SharedPreferences
+            String activityId = activity.getId(); // Убедитесь, что у Activity есть поле id
+
+            FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
+            Call<ResponseBody> call = api.deleteActivity(userId, activityId);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Удаляем элемент из списка и уведомляем адаптер
+                        activities.remove(position);
+                        notifyItemRemoved(position);
+                    } else {
+                        // Обработка ошибки
+                        Toast.makeText(context, "Ошибка при удалении активности", Toast.LENGTH_SHORT).show();
+                        notifyItemChanged(position); // Восстанавливаем элемент
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    // Обработка ошибки сети
+                    Toast.makeText(context, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                    notifyItemChanged(position); // Восстанавливаем элемент
+                }
+            });
         }
 
         @Override
