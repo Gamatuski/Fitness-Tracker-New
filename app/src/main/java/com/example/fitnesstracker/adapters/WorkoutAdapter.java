@@ -2,6 +2,7 @@
 package com.example.fitnesstracker.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.fitnesstracker.R;
+import com.example.fitnesstracker.fragments.WorkoutDetailActivity;
 import com.example.fitnesstracker.models.Workout;
 import java.util.List;
 import com.bumptech.glide.Glide;
@@ -38,7 +40,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
     @Override
     public void onBindViewHolder(@NonNull WorkoutViewHolder holder, int position) {
         Workout workout = workoutList.get(position);
-        holder.workoutName.setText(workout.getAction()); // Используем action как название тренировки
+        holder.workoutName.setText(workout.getAction());
         holder.difficultyText.setText(workout.getDifficulty());
 
         // Устанавливаем цвет текста и иконки в зависимости от уровня сложности
@@ -74,6 +76,13 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
             Log.d("WorkoutAdapter", "No image URL for workout: " + workout.getAction());
             holder.workoutImage.setImageResource(R.drawable.workout_placeholder);
         }
+
+        // Обработка нажатия на элемент списка
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), WorkoutDetailActivity.class);
+            intent.putExtra("workout", workout);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
