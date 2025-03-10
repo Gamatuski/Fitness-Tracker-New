@@ -13,6 +13,7 @@ import com.example.fitnesstracker.models.User;
 import com.example.fitnesstracker.models.UserRequest;
 import com.example.fitnesstracker.models.UserResponse;
 import com.example.fitnesstracker.models.Workout;
+import com.example.fitnesstracker.models.WorkoutResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,8 @@ public interface FitnessApi {
     @POST("auth/login")
     Call<LoginResponse> login(@Body LoginRequest request);
 
-    @GET("workouts")
-    Call<List<Workout>> getWorkouts();
+    @GET("/workouts")
+    Call<List<WorkoutResponse>> getWorkouts();
 
     @GET("auth/users")
     Call<List<User>> getAllUsers(); // метод для получения всех пользователей

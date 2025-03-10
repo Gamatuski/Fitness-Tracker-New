@@ -4,64 +4,71 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
         <!-- Картинка -->
         <ImageView
             android:id="@+id/workoutImage"
             android:layout_width="match_parent"
             android:layout_height="150dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/workout_placeholder" />
 
-        <!-- Название тренировки -->
-        <TextView
-            android:id="@+id/workoutName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Workout Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <!-- Иконка дистанции и уровень сложности -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <!-- Иконка дистанции -->
-            <ImageView
-                android:id="@+id/distanceIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/distance_ic" />
-
-            <!-- Уровень сложности -->
+            <!-- Название тренировки -->
             <TextView
-                android:id="@+id/difficultyText"
+                android:id="@+id/workoutName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Умеренный"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
+                android:layout_marginTop="8dp"
+                android:text="Workout Name"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-        <!-- Количество тренировок в неделю -->
-        <TextView
-            android:id="@+id/workoutsPerWeekText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3 тренировки/неделя"
-            android:textSize="12sp"
-            android:layout_gravity="end"
-            android:layout_marginTop="8dp" />
+            <!-- Иконка дистанции и уровень сложности -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- Иконка дистанции -->
+                <ImageView
+                    android:id="@+id/distanceIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/distance_ic" />
+
+                <!-- Уровень сложности -->
+                <TextView
+                    android:id="@+id/difficultyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Умеренный"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Количество тренировок в неделю -->
+            <TextView
+                android:id="@+id/workoutsPerWeekText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:text="3 тренировки/неделя"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

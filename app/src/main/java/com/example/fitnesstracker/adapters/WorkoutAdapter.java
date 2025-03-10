@@ -45,12 +45,15 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
         switch (workout.getDifficulty().toLowerCase()) {
             case "легкий":
                 holder.difficultyText.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.green));
+                holder.distanceIcon.setBackgroundResource(R.drawable.distance_ic_green);
                 break;
             case "умеренный":
                 holder.difficultyText.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.blue));
+                holder.distanceIcon.setBackgroundResource(R.drawable.distance_ic_blue);
                 break;
             case "сложный":
                 holder.difficultyText.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.red));
+                holder.distanceIcon.setBackgroundResource(R.drawable.distance_ic_red);
                 break;
         }
 

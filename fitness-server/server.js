@@ -228,13 +228,14 @@ app.post('/distance/:userId', async (req, res) => {
 
 app.get('/workouts', async (req, res) => {
     try {
-        const workouts = await Workout.find(); // Получаем все тренировки из базы данных
-        res.status(200).json(workouts); // Возвращаем массив тренировок напрямую
+        const workoutsData = await Workout.find(); // Получаем все тренировки из базы данных
+        res.status(200).json(workoutsData.length > 0 ? workoutsData : []); // Возвращаем массив тренировок напрямую или пустой массив
     } catch (err) {
         console.error('Ошибка при получении тренировок:', err);
         res.status(500).json({ message: 'Ошибка сервера' });
     }
 });
+
 // Функция для получения MET по имени активности
 async function getMETValueForActivity(activityName) {
     try {

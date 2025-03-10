@@ -1,9 +1,8 @@
-
 package com.example.fitnesstracker.fragments;
-
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
@@ -17,19 +16,15 @@ import com.example.fitnesstracker.adapters.WorkoutAdapter;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.Workout;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.example.fitnesstracker.viewmodels.PlanViewModel;
 
-import java.io.IOException;
 import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class PlanFragment extends Fragment {
 
     private RecyclerView workoutRecyclerView;
     private WorkoutAdapter workoutAdapter;
+    private PlanViewModel viewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,41 +33,17 @@ public class PlanFragment extends Fragment {
         workoutRecyclerView = view.findViewById(R.id.workoutRecyclerView);
         workoutRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Загрузка данных из базы данных
-        loadWorkouts();
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getActivity().getApplication())).get(PlanViewModel.class);
 
-        return view;
-    }
-
-    private void loadWorkouts() {
-        FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
-        Call<List<Workout>> call = api.getWorkouts();
-
-        call.enqueue(new Callback<List<Workout>>() {
-            @Override
-            public void onResponse(Call<List<Workout>> call, Response<List<Workout>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Workout> workouts = response.body();
-                    workoutAdapter = new WorkoutAdapter(workouts);
-                    workoutRecyclerView.setAdapter(workoutAdapter);
-                } else {
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                    String responseBody = null;
-                    try {
-                        responseBody = response.errorBody().string();
-                        Log.e("API Error", "Code: " + response.code() + ", Message: " + response.message() + ", Body: " + responseBody);
-                    } catch (IOException e) {
-                        Log.e("API Error", "Code: " + response.code() + ", Message: " + response.message() + ", Body: Could not parse error body");
-                    }
-                    Toast.makeText(requireContext(), "Не удалось загрузить данные. Ошибка: " + response.message(), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Workout>> call, Throwable t) {
-                Log.e("API Failure", "Error: " + t.getMessage(), t);
-                Toast.makeText(requireContext(), "Не удалось загрузить данные. Ошибка сети: " + t.getMessage(), Toast.LENGTH_LONG).show();
+        viewModel.getWorkouts().observe(getViewLifecycleOwner(), workouts -> {
+            if (workouts != null) {
+                workoutAdapter = new WorkoutAdapter(workouts);
+                workoutRecyclerView.setAdapter(workoutAdapter);
+            } else {
+                Toast.makeText(requireContext(), "Не удалось загрузить данные.", Toast.LENGTH_LONG).show();
             }
         });
+
+        return view;
     }
 }
