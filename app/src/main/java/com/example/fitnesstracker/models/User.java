@@ -13,6 +13,8 @@ public class User {
     private int height;
     private int weight;
     private List<Double> distance;
+    private int stepsGoal; // Цель шагов
+    private int distanceGoal; // Цель расстояния
 
 
     // Конструктор по умолчанию (необходим для Gson)
@@ -21,11 +23,13 @@ public class User {
 
 
     // Конструктор
-    public User(String email, String password, int height, int weight) {
+    public User(String email, String password, int height, int weight, int stepsGoal, int distanceGoal) {
         this.email = email;
         this.password = password;
         this.height = height;
         this.weight = weight;
+        this.stepsGoal = stepsGoal;
+        this.distanceGoal = distanceGoal;
     }
 
     // Геттеры и сеттеры
@@ -69,6 +73,22 @@ public class User {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public int getStepsGoal() {
+        return stepsGoal;
+    }
+
+    public void setStepsGoal(int stepsGoal) {
+        this.stepsGoal = stepsGoal;
+    }
+
+    public int getDistanceGoal() {
+        return distanceGoal;
+    }
+
+    public void setDistanceGoal(int distanceGoal) {
+        this.distanceGoal = distanceGoal;
     }
 
 

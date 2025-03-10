@@ -25,6 +25,8 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     height: { type: Number, required: true },
     weight: { type: Number, required: true },
+    stepsGoal: { type: Number, required: true, default: 5000 }, // Цель шагов по умолчанию
+    distanceGoal: { type: Number,required: true, default: 10 }, // Цель расстояния по умолчанию
     steps: { type: [Number], default: [0, 0, 0, 0, 0, 0, 0] },
     distance: { type: [Number], default: [0, 0, 0, 0, 0, 0, 0] },
     activities: [{
@@ -40,13 +42,14 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 const workoutSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     action: { type: String, required: true },
-    distance: { type: Number, required: true },
     duration: { type: Number, required: true },
-    calories: { type: Number, required: true },
-    steps: { type: Number, required: true },
-    date: { type: Date, default: Date.now },
+    difficulty: { type: String, enum: ["легкий", "умеренный", "сложный"], default: "умеренный" },
+    workoutsPerWeek: { type: Number, default: 3 },
+    image: {
+        imageUrl: { type: String },
+        contentType: { type: String }
+    }
 });
 
 const Workout = mongoose.model('Workout', workoutSchema);
@@ -132,21 +135,40 @@ app.get('/steps/:userId', async (req, res) => {
 
 app.post('/steps/:userId', async (req, res) => {
     const { userId } = req.params;
-    const { steps, dayIndex } = req.body;
+    const { steps, dayIndex } = req.body; // Получаем данные из тела запроса
 
     try {
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+            return res.status(404).json({
+                success: false,
+                message: 'Пользователь не найден'
+            });
         }
 
+        // Проверяем корректность индекса
+        if (dayIndex < 0 || dayIndex >= 7) {
+            return res.status(400).json({
+                success: false,
+                message: 'Некорректный индекс дня'
+            });
+        }
+
+        // Обновляем значение шагов для конкретного дня
         user.steps[dayIndex] = steps;
         await user.save();
 
-        res.status(200).json({ success: true, steps: user.steps });
+        res.status(200).json({
+            success: true,
+            steps: user.steps,
+            message: 'Шаги успешно обновлены'
+        });
     } catch (err) {
-        console.error('Error updating steps:', err);
-        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+        console.error('Ошибка обновления шагов:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка сервера при обновлении шагов'
+        });
     }
 });
 
@@ -173,46 +195,46 @@ app.post('/distance/:userId', async (req, res) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+            return res.status(404).json({
+                success: false,
+                message: 'Пользователь не найден'
+            });
+        }
+
+        if (dayIndex < 0 || dayIndex >= 7) {
+            return res.status(400).json({
+                success: false,
+                message: 'Некорректный индекс дня'
+            });
         }
 
         user.distance[dayIndex] = distance;
         await user.save();
 
-        res.status(200).json({ success: true, distance: user.distance });
+        res.status(200).json({
+            success: true,
+            distance: user.distance,
+            message: 'Расстояние успешно обновлено'
+        });
     } catch (err) {
-        console.error('Error updating distance:', err);
-        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+        console.error('Ошибка обновления расстояния:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка сервера при обновлении расстояния'
+        });
     }
 });
 
 
-app.post('/workouts', async (req, res) => {
-    const { userId, action, distance, duration, calories, steps } = req.body;
-
+app.get('/workouts', async (req, res) => {
     try {
-        const workout = new Workout({ userId, action, distance, duration, calories, steps });
-        await workout.save();
-
-        res.status(201).json({ success: true, message: 'Тренировка добавлена', workout });
+        const workouts = await Workout.find(); // Получаем все тренировки из базы данных
+        res.status(200).json(workouts); // Возвращаем массив тренировок напрямую
     } catch (err) {
-        console.error('Error creating workout:', err);
-        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+        console.error('Ошибка при получении тренировок:', err);
+        res.status(500).json({ message: 'Ошибка сервера' });
     }
 });
-
-app.get('/workouts/:userId', async (req, res) => {
-    const { userId } = req.params;
-
-    try {
-        const workouts = await Workout.find({ userId });
-        res.status(200).json({ success: true, workouts });
-    } catch (err) {
-        console.error('Error getting workouts:', err);
-        res.status(500).json({ success: false, message: 'Ошибка сервера' });
-    }
-});
-
 // Функция для получения MET по имени активности
 async function getMETValueForActivity(activityName) {
     try {
@@ -285,6 +307,81 @@ app.get('/activities/:action', async (req, res) => {
         res.status(500).json({ success: false, message: 'Ошибка сервера' });
     }
 });
+
+app.get('/users/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        res.status(200).json({ success: true, user });
+    } catch (err) {
+        console.error('Ошибка при получении данных пользователя:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
+// Эндпоинт для удаления активности
+app.delete('/users/:userId/activities/:activityId', async (req, res) => {
+    const { userId, activityId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        const activityIndex = user.activities.findIndex(activity => activity._id.toString() === activityId);
+        if (activityIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Активность не найдена' });
+        }
+
+        user.activities.splice(activityIndex, 1);
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Активность удалена' });
+    } catch (err) {
+        console.error('Ошибка при удалении активности:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+    }
+});
+
+app.put('/users/:userId/goals', async (req, res) => {
+    const { userId } = req.params;
+    const { stepsGoal, distanceGoal } = req.body;
+
+    try {
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $set: { stepsGoal, distanceGoal } },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Пользователь не найден'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Цели обновлены',
+            user
+        });
+    } catch (err) {
+        console.error('Ошибка при обновлении целей:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка сервера'
+        });
+    }
+});
+
+
 
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);

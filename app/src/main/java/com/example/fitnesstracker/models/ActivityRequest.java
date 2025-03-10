@@ -1,6 +1,7 @@
 package com.example.fitnesstracker.models;
 
 public class ActivityRequest {
+    private String id;
     private String action;
     private double distance;
     private int calories;

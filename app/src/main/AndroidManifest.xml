@@ -37,11 +37,17 @@
             android:foregroundServiceType="health"
             >
         </service>
+        <service
+            android:name=".service.TimerService"
+            android:enabled="true"
+            android:exported="false" />
 
 
         <activity android:name=".activities.RegisterActivity" />
         <activity android:name=".activities.AddTrainingActivity" />
+        <activity android:name=".fragments.WeeklyReportActivity"/>
         <activity android:name=".activities.DashboardActivity" />
+        <activity android:name=".fragments.EditGoalsActivity"/>
         <activity android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>

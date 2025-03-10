@@ -70,7 +70,7 @@ public class WeeklyReportActivity extends AppCompatActivity {
                         int averageSteps = (int) calculateAverage(stepsData);
                         averageStepsTextView.setText(String.valueOf(averageSteps));
 
-                        setupBarChart(stepsBarChart, convertToBarEntries(stepsData), "Шаги", averageSteps, 10000, ContextCompat.getColor(WeeklyReportActivity.this, R.color.purpule));
+                        setupBarChart(stepsBarChart, convertToBarEntries(stepsData), "Шаги", averageSteps, 5000, ContextCompat.getColor(WeeklyReportActivity.this, R.color.purpule));
                     } else {
                         Toast.makeText(WeeklyReportActivity.this, "Неверный формат данных о шагах", Toast.LENGTH_SHORT).show();
                     }
@@ -161,7 +161,7 @@ public class WeeklyReportActivity extends AppCompatActivity {
 
         // Добавляем пунктирные линии
         LimitLine averageLine = new LimitLine((float) averageValue, "Среднее");
-        averageLine.setLineColor(android.graphics.Color.BLUE);
+        averageLine.setLineColor(Color.GRAY);
         averageLine.setLineWidth(1f);
         averageLine.enableDashedLine(10f, 10f, 0f); // Пунктирная линия
         yAxis.addLimitLine(averageLine);

@@ -1,8 +1,11 @@
 package com.example.fitnesstracker.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 public class Activity {
+    @SerializedName("_id")
     private String id;
     private String action;
     private double distance;

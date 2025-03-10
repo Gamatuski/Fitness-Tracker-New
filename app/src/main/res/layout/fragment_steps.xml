@@ -70,7 +70,7 @@
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/goalTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/stepsCountTextView"
@@ -106,9 +106,10 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:src="@drawable/ic_steps"
-                android:tint="@color/purpule"/>
+                app:tint="@color/purpule" />
 
             <TextView
+                android:id="@+id/stepsTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Шаги"
@@ -143,6 +144,7 @@
                 />
 
             <TextView
+                android:id="@+id/distanceTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Расстояние"

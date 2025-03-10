@@ -1,5 +1,6 @@
 package com.example.fitnesstracker.adapters;
 
+import android.app.AlertDialog;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -34,7 +35,14 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
-        adapter.deleteItem(position); // Удаляем элемент из адаптера
+
+        // Показываем диалог подтверждения
+        new AlertDialog.Builder(viewHolder.itemView.getContext())
+                .setTitle("Удаление")
+                .setMessage("Вы уверены, что хотите удалить этот элемент?")
+                .setPositiveButton("Да", (dialog, which) -> adapter.deleteItem(position))
+                .setNegativeButton("Нет", (dialog, which) -> adapter.notifyItemChanged(position)) // Отмена удаления
+                .show();
     }
 
     @Override
@@ -62,6 +70,6 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
         textPaint.setColor(Color.WHITE);
         textPaint.setTextSize(48); // Размер текста
         textPaint.setTextAlign(Paint.Align.CENTER);
-        c.drawText("Удалить", itemView.getRight() - 200, itemView.getTop() + itemHeight / 2 + 20, textPaint);
+        c.drawText("Удалить", itemView.getRight() - 300, itemView.getTop() + itemHeight / 2 + 20, textPaint);
     }
 }

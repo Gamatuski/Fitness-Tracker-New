@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.example.fitnesstracker.adapters.SwipeToDeleteCallback;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.Activity;
+import com.example.fitnesstracker.models.ActivityResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -140,30 +142,33 @@ public class ProgressFragment extends Fragment {
 
         public void deleteItem(int position) {
             Activity activity = activities.get(position);
-            String userId = getUserIdFromSharedPreferences(); // Получите userId из SharedPreferences
-            String activityId = activity.getId(); // Убедитесь, что у Activity есть поле id
+            String userId = getUserIdFromSharedPreferences();
+            String activityId = activity.getId();
+
+            Log.d("DeleteActivity", "User ID: " + userId);
+            Log.d("DeleteActivity", "Activity ID: " + activityId);
 
             FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
-            Call<ResponseBody> call = api.deleteActivity(userId, activityId);
-            call.enqueue(new Callback<ResponseBody>() {
+            Call<ActivityResponse> call = api.deleteActivity(userId, activityId);
+            call.enqueue(new Callback<ActivityResponse>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                public void onResponse(Call<ActivityResponse> call, Response<ActivityResponse> response) {
                     if (response.isSuccessful()) {
-                        // Удаляем элемент из списка и уведомляем адаптер
+                        Log.d("DeleteActivity", "Activity deleted successfully");
                         activities.remove(position);
                         notifyItemRemoved(position);
                     } else {
-                        // Обработка ошибки
+                        Log.e("DeleteActivity", "Error deleting activity: " + response.message());
                         Toast.makeText(context, "Ошибка при удалении активности", Toast.LENGTH_SHORT).show();
-                        notifyItemChanged(position); // Восстанавливаем элемент
+                        notifyItemChanged(position);
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    // Обработка ошибки сети
+                public void onFailure(Call<ActivityResponse> call, Throwable t) {
+                    Log.e("DeleteActivity", "Network error: " + t.getMessage());
                     Toast.makeText(context, "Ошибка сети", Toast.LENGTH_SHORT).show();
-                    notifyItemChanged(position); // Восстанавливаем элемент
+                    notifyItemChanged(position);
                 }
             });
         }
@@ -179,7 +184,19 @@ public class ProgressFragment extends Fragment {
             Activity activity = activities.get(position);
             holder.actionTextView.setText(activity.getAction());
             holder.durationTextView.setText(activity.getDuration() + " мин");
-            holder.distanceTextView.setText(activity.getDistance() + " км");
+
+            // Форматирование отображения расстояния
+            double distance = activity.getDistance();
+            if (distance < 1.0) {
+                // Переводим в метры и округляем до целых
+                int distanceInMeters = (int) (distance * 1000);
+                holder.distanceTextView.setText(distanceInMeters + " м");
+            } else {
+                // Округляем до двух знаков после запятой для километров
+                String formattedDistance = String.format("%.2f км", distance);
+                holder.distanceTextView.setText(formattedDistance);
+            }
+
             holder.caloriesTextView.setText(activity.getCalories() + " ккал");
 
             // Получаем текущую дату

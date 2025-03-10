@@ -40,25 +40,44 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <EditText
-                    android:id="@+id/emailEditText"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email"
-                    android:inputType="textEmailAddress"
-                    android:padding="12dp"
-                    android:background="@drawable/edittext_background"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="16dp"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/ic_email"
+                    app:endIconTint="@color/gray">
 
-                <EditText
-                    android:id="@+id/passwordEditText"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/emailEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Email"
+                        android:inputType="textEmailAddress"
+                        android:padding="12dp"
+                        android:background="@drawable/edittext_background"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/passwordInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password"
-                    android:inputType="textPassword"
-                    android:padding="12dp"
-                    android:background="@drawable/edittext_background"
-                    android:layout_marginBottom="16dp"/>
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleDrawable="@drawable/password_toggle_drawable"
+                    android:layout_marginBottom="16dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/passwordEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Password"
+                        android:inputType="textPassword"
+                        android:padding="12dp"
+                        android:background="@drawable/edittext_background"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:id="@+id/errorTextView"

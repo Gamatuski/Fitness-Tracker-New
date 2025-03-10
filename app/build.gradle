@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.fitnesstracker"
-        minSdk 35
+        minSdk 30
         targetSdk 35
         versionCode 1
         versionName "1.0"
@@ -83,6 +83,9 @@ dependencies {
 
     implementation libs.okhttp3.logging.interceptor.v4120
     implementation libs.androidx.recyclerview
+
+    implementation libs.glide
+    annotationProcessor libs.compiler
 }
 
 configurations {

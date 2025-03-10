@@ -30,6 +30,8 @@ import com.example.fitnesstracker.models.LoginRequest;
 import com.example.fitnesstracker.models.LoginResponse;
 import com.example.fitnesstracker.service.StepCounterService;
 import com.example.fitnesstracker.utils.StyleTitleText;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -43,7 +45,9 @@ import retrofit2.Response;
 import android.content.SharedPreferences;
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText emailEditText, passwordEditText;
+
+    private TextInputLayout passwordInputLayout, emailInputLayout;
+    private TextInputEditText passwordEditText, emailEditText;
     private Button loginButton;
     private TextView registerTextView, titleTextView, errorTextView;;
     private CardView loginCard;
@@ -55,8 +59,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        emailInputLayout = findViewById(R.id.emailInputLayout);
         emailEditText = findViewById(R.id.emailEditText);
+
+        passwordInputLayout = findViewById(R.id.passwordInputLayout);
         passwordEditText = findViewById(R.id.passwordEditText);
+
         loginButton = findViewById(R.id.loginButton);
         registerTextView = findViewById(R.id.registerTextView);
         loginCard = findViewById(R.id.loginCard);

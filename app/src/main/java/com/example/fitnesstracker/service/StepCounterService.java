@@ -12,9 +12,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
@@ -28,7 +31,10 @@ import com.example.fitnesstracker.models.StepsResponse;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,12 +44,24 @@ public class StepCounterService extends Service implements SensorEventListener {
     private static final String CHANNEL_ID = "StepCounterChannel";
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
-    private int stepCount = 0;
-    private int previousDayOfWeek = -1; // Для отслеживания смены дня
-    private String userId;
+    private int initialStepCount = -1;
+    private int baseSteps = 0;  // Добавляем переменную для хранения базового значения шагов
 
-    private int stepsDuringTimer = 0; // Шаги, сделанные за время таймера
-    private boolean isTimerRunning = false; // Флаг, указывающий, что таймер запущен
+    private int currentStepCount = 0;
+    private int timerInitialSteps = 0;
+    private int stepsDuringTimer = 0;
+    private boolean isTimerRunning = false;
+    private String userId;
+    private int previousDayOfWeek = -1;
+    private boolean isInitialized = false;
+
+    public class StepBinder extends Binder {
+        public StepCounterService getService() {
+            return StepCounterService.this;
+        }
+    }
+
+    private final IBinder binder = new StepBinder();
 
     @Override
     public void onCreate() {
@@ -53,37 +71,80 @@ public class StepCounterService extends Service implements SensorEventListener {
             stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
             if (stepCounterSensor == null) {
                 Log.e("StepCounterService", "Step Counter Sensor не найден!");
-                stopSelf(); // Остановить службу, если датчик отсутствует
+                Toast.makeText(this, "Ваше устройство не поддерживает подсчёт шагов", Toast.LENGTH_LONG).show();
+                stopSelf();
                 return;
             }
         } else {
             Log.e("StepCounterService", "Sensor Manager не инициализирован!");
-            stopSelf(); // Остановить службу, если SensorManager не доступен
-            return;
-        }
-
-        // Получение userId из SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
-        userId = sharedPreferences.getString("userId", null);
-        if (userId == null) {
-            Log.e("StepCounterService", "userId не найден. Служба остановлена.");
             stopSelf();
             return;
         }
 
-        // Создание уведомления для Foreground Service
+        SharedPreferences sharedPreferences = getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
+        userId = sharedPreferences.getString("userId", null);
+        if (userId == null) {
+            Log.e("StepCounterService", "userId не найден");
+            stopSelf();
+            return;
+        }
+        if (!isInitialized) {
+            loadCurrentStepsFromDatabase(() -> {
+                isInitialized = true;
+            });
+            return;
+        }
+
         createNotificationChannel();
-        Notification notification = buildNotification("Служба отслеживания шагов запущена");
-        startForeground(1, notification);
+        startForeground(1, buildNotification("Служба отслеживания шагов запущена"));
+    }
+
+    private void loadCurrentStepsFromDatabase(Runnable onComplete) {
+        FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
+        Call<StepsResponse> call = api.getSteps(userId);
+
+        call.enqueue(new Callback<StepsResponse>() {
+            @Override
+            public void onResponse(Call<StepsResponse> call, Response<StepsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Calendar calendar = Calendar.getInstance();
+                    int dayIndex = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+                    if (dayIndex == -1) dayIndex = 6;
+
+                    List<Integer> steps = response.body().getSteps();
+                    if (steps != null && dayIndex < steps.size()) {
+                        baseSteps = steps.get(dayIndex);
+                        Log.d("StepCounterService", "Загружено базовое значение шагов: " + baseSteps);
+                    }
+                }
+                onComplete.run();
+            }
+
+            @Override
+            public void onFailure(Call<StepsResponse> call, Throwable t) {
+                Log.e("StepCounterService", "Ошибка загрузки шагов: " + t.getMessage());
+                onComplete.run();
+            }
+        });
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (stepCounterSensor != null) {
+        createNotificationChannel();
+        startForeground(1, buildNotification("Отслеживание шагов активно"));
+
+        if (sensorManager != null) {
             sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        return START_STICKY; // Перезапустить службу, если она была остановлена системой
+
+        return START_STICKY;
     }
+
 
     @Override
     public void onDestroy() {
@@ -93,154 +154,113 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            int currentSteps = (int) event.values[0];
-            if (stepCount == 0) {
-                stepCount = currentSteps; // Инициализация начального значения
-            }
-            int stepsTaken = currentSteps - stepCount; // Шаги, сделанные с момента запуска службы
-            stepCount = currentSteps; // Обновление общего количества шагов
-
-            if (isTimerRunning) {
-                stepsDuringTimer += stepsTaken; // Учитываем шаги только во время работы таймера
+            if (!isInitialized) {
+                initialStepCount = (int) event.values[0];
+                loadCurrentStepsFromDatabase(() -> {
+                    isInitialized = true;
+                });
+                return;
             }
 
-            int currentDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2; // Понедельник - 0, Воскресенье - 6
-            if (currentDayOfWeek == -1) {
-                currentDayOfWeek = 6; // Воскресенье
-            }
+            int currentSteps = (int) event.values[0] - initialStepCount + baseSteps;
 
-            if (previousDayOfWeek != currentDayOfWeek) {
-                // Сменился день недели, обнуляем шаги (если нужно начинать подсчет с нуля каждый день)
-                previousDayOfWeek = currentDayOfWeek;
-                stepsTaken = 0; // Начать подсчет шагов за новый день с нуля
-                stepCount = currentSteps; // Сбросить базовое значение для нового дня
-                updateNotification("Начался новый день. Шаги за сегодня: 0");
-            } else {
-                updateNotification("Шаги за сегодня: " + stepsTaken);
-            }
+            Calendar calendar = Calendar.getInstance();
+            int dayIndex = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+            if (dayIndex == -1) dayIndex = 6;
 
-            // Обновление шагов в базе данных
-            updateStepsToDatabase(stepsTaken, currentDayOfWeek);
+            updateStepsToDatabase(currentSteps, dayIndex);
         }
     }
 
-    // Метод для запуска отслеживания шагов во время таймера
-    public void startTrackingStepsForTimer() {
-        stepsDuringTimer = 0; // Сбрасываем счётчик шагов
-        isTimerRunning = true; // Указываем, что таймер запущен
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Not used
     }
 
-    // Метод для остановки отслеживания шагов и возврата пройденных шагов
+    public void startTrackingStepsForTimer() {
+        timerInitialSteps = currentStepCount;
+        stepsDuringTimer = 0;
+        isTimerRunning = true;
+    }
+
     public int stopTrackingStepsForTimer() {
-        isTimerRunning = false; // Останавливаем отслеживание
-        return stepsDuringTimer; // Возвращаем количество шагов за время таймера
+        isTimerRunning = false;
+        return stepsDuringTimer;
+    }
+
+    public int getCurrentStepCount() {
+        return currentStepCount;
+    }
+
+    public void forceUpdateStepsToDatabase(int dayIndex) {
+        updateStepsToDatabase(currentStepCount, dayIndex);
     }
 
     private void updateStepsToDatabase(int steps, int dayIndex) {
-        if (userId == null) {
-            Log.e("StepCounterService", "userId не доступен, не могу обновить базу данных.");
-            return;
-        }
+        if (!isInitialized || userId == null) return;
+
+        Map<String, Integer> stepsData = new HashMap<>();
+        stepsData.put("steps", steps);
+        stepsData.put("dayIndex", dayIndex);
+
         FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
-        Call<StepsResponse> call = api.getSteps(userId); // Получаем текущие шаги из БД
+        Call<StepsResponse> call = api.updateSteps(userId, stepsData);
+
         call.enqueue(new Callback<StepsResponse>() {
             @Override
             public void onResponse(Call<StepsResponse> call, Response<StepsResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    StepsResponse stepsResponse = response.body();
-                    if (stepsResponse.isSuccess() && stepsResponse.getSteps() != null) {
-                        java.util.List<Integer> currentStepsList = stepsResponse.getSteps();
-                        if (dayIndex >= 0 && dayIndex < currentStepsList.size()) {
-                            int previousSteps = currentStepsList.get(dayIndex);
-                            int updatedSteps = previousSteps + steps;
-                            currentStepsList.set(dayIndex, updatedSteps); // Обновляем шаги за текущий день
-
-                            // Отправляем обновленные данные на сервер
-                            Call<StepsResponse> updateCall = api.updateSteps(userId, dayIndex, updatedSteps); // Отправляем одно значение
-                            updateCall.enqueue(new Callback<StepsResponse>() {
-                                @Override
-                                public void onResponse(Call<StepsResponse> call, Response<StepsResponse> updateResponse) {
-                                    if (updateResponse.isSuccessful() && updateResponse.body() != null) {
-                                        StepsResponse updateResponseBody = updateResponse.body();
-                                        if (updateResponseBody.isSuccess()) {
-                                            Log.d("StepCounterService", "Шаги успешно обновлены в БД, день: " + dayIndex + ", шаги: " + updatedSteps);
-                                        } else {
-                                            Log.e("StepCounterService", "Ошибка обновления шагов в БД: " + updateResponseBody.getMessage());
-                                        }
-                                    } else {
-                                        Log.e("StepCounterService", "Ошибка сервера при обновлении шагов: " + updateResponse.message());
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<StepsResponse> call, Throwable t) {
-                                    Log.e("StepCounterService", "Сетевая ошибка при обновлении шагов: " + t.getMessage());
-                                }
-                            });
-
-
-                        } else {
-                            Log.e("StepCounterService", "Неверный dayIndex или данные о шагах из БД неполные.");
-                        }
-                    } else {
-                        Log.e("StepCounterService", "Не удалось получить шаги из БД или запрос не успешен: " + stepsResponse.getMessage());
-                    }
-                } else {
-                    Log.e("StepCounterService", "Ошибка при получении шагов из БД: " + response.message());
+                if (response.isSuccessful()) {
+                    Log.d("StepCounterService", "Шаги обновлены: " + steps);
                 }
             }
 
             @Override
             public void onFailure(Call<StepsResponse> call, Throwable t) {
-                Log.e("StepCounterService", "Сетевая ошибка при получении шагов из БД: " + t.getMessage());
+                Log.e("StepCounterService", "Ошибка обновления шагов: " + t.getMessage());
             }
         });
     }
 
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Не используется
-    }
-
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
+            NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "Служба отслеживания шагов",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_LOW
             );
+            channel.setDescription("Канал для отображения шагов в реальном времени");
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
         }
     }
 
     private Notification buildNotification(String text) {
         Intent notificationIntent = new Intent(this, StepsFragment.class);
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                notificationIntent,
+                PendingIntent.FLAG_IMMUTABLE
+        );
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Fitness Tracker - Отслеживание шагов")
                 .setContentText(text)
-                .setSmallIcon(R.drawable.ic_notification) // Замените на свой значок уведомления
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true)
                 .build();
     }
 
     private void updateNotification(String text) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = buildNotification(text);
-        notificationManager.notify(1, notification);
+        if (notificationManager != null) {
+            notificationManager.notify(1, buildNotification(text));
+        }
     }
 }

@@ -8,4 +8,6 @@
     <color name="smoky_white">#f2f2f6</color>
     <color name="light_gray">#D3D3D3</color>
     <color name="yellow">#d39969</color>
+    <color name="green">#19b80b</color>
+    <color name="blue">#3333ff</color>
 </resources>

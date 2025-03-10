@@ -67,10 +67,10 @@ public class AddTrainingActivity extends AppCompatActivity {
         // Форматируем дату в строку
         String formattedDate = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
+        startDateEditText = findViewById(R.id.startDateEditText);
         // Устанавливаем текст в поле редактирования
         startDateEditText.setText(formattedDate);
 
-        startDateEditText = findViewById(R.id.startDateEditText);
 
         // Добавление TextWatcher для автоматического форматирования даты
         startDateEditText.addTextChangedListener(new TextWatcher() {

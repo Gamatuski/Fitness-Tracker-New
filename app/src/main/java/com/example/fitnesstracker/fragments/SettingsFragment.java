@@ -29,6 +29,13 @@ public class SettingsFragment extends Fragment {
             openGoogleFit();
         });
 
+        // Обработка нажатия на "Изменить цели"
+        view.findViewById(R.id.editGoalsLayout).setOnClickListener(v -> {
+            // Открываем новую активность для отчёта
+            Intent intent = new Intent(getActivity(), EditGoalsActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 
