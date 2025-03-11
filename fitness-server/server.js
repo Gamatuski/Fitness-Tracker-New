@@ -264,11 +264,6 @@ app.post('/users/:userId/activities', async (req, res) => {
 
         user.activities.push({ action, distance, calories, steps, duration, date });
 
-        // Обновление массива расстояний
-        const currentDayOfWeek = new Date(date).getDay(); // Получаем день недели (0 - воскресенье, 1 - понедельник и т.д.)
-        user.distance[currentDayOfWeek] += distance; // Добавляем пройденное расстояние к соответствующему дню
-
-        await user.save();
 
         res.status(201).json({ success: true, message: 'Активность добавлена' });
     } catch (err) {

@@ -100,15 +100,16 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
 
-    private double totalDistance = 0.0;
     private Marker userMarker;
 
     private double userWeight = 0.0; // Вес пользователя
+    private float userHeight = 0.0f; // Рост пользователя
     private int goalSteps;
     private int goalDistance;
 
     private static final int ACTIVITY_RECOGNITION_REQUEST_CODE = 200;
     private boolean isFragmentAttached = false;
+    private double totalDistance;
 
 
     private final ServiceConnection connection = new ServiceConnection() {
@@ -169,7 +170,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                 stopTimer();
                 startButton.setText("Начать");
                 triggerAlarm();
-                saveActivity();
             }
         }
     };
@@ -184,7 +184,7 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         String userId = sharedPreferences.getString("userId", null);
 
         if (userId != null) {
-            loadUserWeight(userId); // Загружаем вес пользователя
+            loadUserWeightAndHeight(userId); // Загружаем вес пользователя
         } else {
             Log.e("LoadUserWeight", "User ID is null");
             Toast.makeText(requireContext(), "Ошибка: Пользователь не залогинен", Toast.LENGTH_SHORT).show();
@@ -237,7 +237,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         updateTimerDisplay();
         if (isRunning) {
             startButton.setText("Остановить");
-            startTimer();
         } else {
             startButton.setText("Начать");
         }
@@ -252,7 +251,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
 
         // Запрос разрешений
         requestLocationPermissions();
-        loadDistanceFromDatabase();
 
 
         return view;
@@ -302,6 +300,7 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+
     // Запуск обновлений местоположения
     private void startLocationUpdates() {
         locationRequest = LocationRequest.create();
@@ -329,21 +328,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                     // Перемещение камеры к текущему местоположению
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
 
-                    // Расчёт пройденного расстояния
-                    if (previousLocation != null) {
-                        float[] results = new float[1];
-                        Location.distanceBetween(
-                                previousLocation.getLatitude(),
-                                previousLocation.getLongitude(),
-                                location.getLatitude(),
-                                location.getLongitude(),
-                                results
-                        );
-                        totalDistance += results[0] / 1000; // Переводим в километры
-
-                        updateDistanceToDatabase(totalDistance, getDayIndex());
-                    }
-                    previousLocation = location;
                 }
             }
         };
@@ -369,74 +353,8 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void loadDistanceFromDatabase() {
-        if (!isFragmentAttached) return;
-
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", null);
-
-        FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
-        Call<DistanceResponse> call = api.getDistance(userId);
-
-        call.enqueue(new Callback<DistanceResponse>() {
-            @Override
-            public void onResponse(Call<DistanceResponse> call, Response<DistanceResponse> response) {
-                if (!isFragmentAttached) return;
-
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Double> distances = response.body().getDistance();
-                    if (distances != null && getDayIndex() < distances.size()) {
-                        totalDistance = distances.get(getDayIndex());
-                        Log.d("StartFragment", "Загружена дистанция из БД: " + totalDistance);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DistanceResponse> call, Throwable t) {
-                if (!isFragmentAttached) return;
-                Log.e("StartFragment", "Ошибка загрузки дистанции: " + t.getMessage());
-            }
-        });
-    }
 
 
-    private void updateDistanceToDatabase(double distance, int dayIndex) {
-
-        if (!isFragmentAttached) return;
-
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
-        String userId = sharedPreferences.getString("userId", null);
-
-        if (userId == null) return;
-
-        Activity activity = getActivity();
-        if (activity == null) return;
-
-        Map<String, Double> distanceData = new HashMap<>();
-        distanceData.put("distance", distance+totalDistance);
-        distanceData.put("dayIndex", (double) dayIndex);
-
-        FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
-        Call<DistanceResponse> call = api.updateDistance(userId, distanceData);
-
-        call.enqueue(new Callback<DistanceResponse>() {
-            @Override
-            public void onResponse(Call<DistanceResponse> call, Response<DistanceResponse> response) {
-                if (!isFragmentAttached) return;
-
-                if (response.isSuccessful()) {
-                    Log.d("StartFragment", "Расстояние обновлено: " + distance);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DistanceResponse> call, Throwable t) {
-                if (!isFragmentAttached) return;
-                Log.e("StartFragment", "Ошибка обновления расстояния: " + t.getMessage());
-            }
-        });
-    }
 
     // Обработка результата запроса разрешений
     @Override
@@ -468,16 +386,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                 new IntentFilter(TimerService.TIMER_UPDATE)
         );
 
-        // Bind to StepCounterService
-        Intent stepIntent = new Intent(requireContext(), StepCounterService.class);
-        requireContext().bindService(stepIntent, stepServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // Start the service
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            requireContext().startForegroundService(stepIntent);
-        } else {
-            requireContext().startService(stepIntent);
-        }
     }
 
     @Override
@@ -497,21 +405,66 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
 
 
     private void startTimer() {
-        if (bound) {
-            stepCounterService.startTrackingStepsForTimer();
+        if (isBound && stepCounterService != null) {
             isRunning = true;
             timerViewModel.setRunning(true);
             timerService.startTimer(seconds);
             startButton.setText("Остановить");
+        } else {
+            Log.e("StartFragment", "StepCounterService is not bound yet");
+            // Можно добавить повторную попытку через некоторое время
+            handler.postDelayed(() -> {
+                if (isBound && stepCounterService != null) {
+                    isRunning = true;
+                    timerViewModel.setRunning(true);
+                    timerService.startTimer(seconds);
+                    startButton.setText("Остановить");
+                } else {
+                    Log.e("StartFragment", "StepCounterService is still not bound");
+                }
+            }, 1000); // Повторная попытка через 1 секунду
         }
     }
 
     private void stopTimer() {
-        if (bound) {
+        if (isBound && stepCounterService != null) {
             isRunning = false;
             timerViewModel.setRunning(false);
             timerService.stopTimer();
             startButton.setText("Начать");
+
+            // Получаем шаги, сделанные за время таймера
+            int stepsDuringTimer = stepCounterService.stopTrackingStepsForTimer();
+            Log.d("StartFragment", "Шаги за таймер: " + stepsDuringTimer);
+
+            // Получаем общую длительность активности
+            long totalDuration = stepCounterService.getTotalDuration();
+            Log.d("StartFragment", "Длительность активности: " + totalDuration + " секунд");
+
+            // Получаем totalDistance из StepCounterService
+            double distanceDuringTimer = stepCounterService.getDistanceDuringTimer();
+            Log.d("StartFragment", "Дистанция за таймер: " + distanceDuringTimer + " км");
+
+            // Сохраняем активность
+            saveActivity(distanceDuringTimer, stepsDuringTimer, totalDuration);
+        } else {
+            Log.e("StartFragment", "StepCounterService is not bound or is null");
+            // Можно добавить повторную попытку через некоторое время
+            handler.postDelayed(() -> {
+                if (isBound && stepCounterService != null) {
+                    isRunning = false;
+                    timerViewModel.setRunning(false);
+                    timerService.stopTimer();
+                    startButton.setText("Начать");
+
+                    int stepsDuringTimer = stepCounterService.stopTrackingStepsForTimer();
+                    long totalDuration = stepCounterService.getTotalDuration();
+                    double distanceDuringTimer = stepCounterService.getDistanceDuringTimer();
+                    saveActivity(distanceDuringTimer, stepsDuringTimer, totalDuration);
+                } else {
+                    Log.e("StartFragment", "StepCounterService is still not bound");
+                }
+            }, 1000); // Повторная попытка через 1 секунду
         }
     }
 
@@ -530,44 +483,40 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         timerTextView.setText(time);
     }
 
-    // Логика работы таймера
-    private final Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (isRunning) {
-                if (seconds > 0) {
-                    seconds--; // Уменьшаем таймер на 1 секунду
-                    updateTimerDisplay();
-                } else {
-                    stopTimer(); // Останавливаем таймер, когда он достигает 0
-                    startButton.setText("Начать");
-                    triggerAlarm(); // Запуск сигнала
 
-                    // Получаем шаги, сделанные за время таймера
-                    if (stepCounterService != null) {
-                        stepsDuringTimer = stepCounterService.stopTrackingStepsForTimer();
-                    }
-
-                    // Сохранение активности и расчёт калорий
-                    saveActivity();
-                }
-                handler.postDelayed(this, 1000); // Повторяем каждую секунду
-            }
-        }
-    };
-
-    private void loadUserWeight(String userId) {
+    private void loadUserWeightAndHeight(String userId) {
         FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
         Call<UserResponse> call = api.getUser(userId);
         call.enqueue(new Callback<UserResponse>() {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    User user = response.body().getUser();;
+                    User user = response.body().getUser();
                     userWeight = user.getWeight(); // Получаем вес пользователя
+                    userHeight = user.getHeight(); // Получаем рост пользователя
                     goalSteps = user.getStepsGoal();
                     goalDistance = user.getDistanceGoal();
+
+                    // Сохраняем userHeight в SharedPreferences
+                    SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putFloat("userHeight", (float) userHeight); // Сохраняем как float
+                    editor.apply();
+
                     Log.d("LoadUserWeight", "User weight loaded: " + userWeight);
+                    Log.d("LoadUserHeight", "User height loaded: " + userHeight);
+
+                    // Bind to StepCounterService
+                    Intent stepIntent = new Intent(requireContext(), StepCounterService.class);
+                    requireContext().bindService(stepIntent, stepServiceConnection, Context.BIND_AUTO_CREATE);
+
+                    // Start the service
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        requireContext().startForegroundService(stepIntent);
+                    } else {
+                        requireContext().startService(stepIntent);
+                    }
+
                 } else {
                     Log.e("LoadUserWeight", "Error loading user data: " + response.message());
                     Toast.makeText(requireContext(), "Ошибка при получении данных пользователя", Toast.LENGTH_SHORT).show();
@@ -582,16 +531,27 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private void saveActivity() {
+    private void saveActivity(double distanceDuringTimer, int stepsDuringTimer, long totalDuration) {
+        Log.d("SaveActivity", "Начало сохранения активности");
+
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString("userId", null);
+        Log.d("SaveActivity", "userId: " + userId);
+
         if (userId == null) {
             Toast.makeText(requireContext(), "Ошибка: Пользователь не залогинен", Toast.LENGTH_SHORT).show();
+            Log.e("SaveActivity", "Ошибка: Пользователь не залогинен");
             return;
         }
 
+        // Получаем выбранную активность из Spinner
         String selectedActivity = activitySpinner.getSelectedItem().toString();
-        double durationInHours = seconds / 3600.0; // Переводим секунды в часы
+        Log.d("SaveActivity", "selectedActivity: " + selectedActivity);
+
+        // Переводим секунды в часы для расчета калорий
+        double durationInHours = totalDuration / 3600;
+        double durationInMin = totalDuration / 60.0;
+        Log.d("SaveActivity", "durationInMin: " + durationInMin);
 
         // Находим MET для выбранной активности
         double met = 0;
@@ -601,37 +561,55 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                 break;
             }
         }
+        Log.d("SaveActivity", "met: " + met);
 
         // Расчёт калорий
         double caloriesBurned = userWeight * met * durationInHours;
+        Log.d("SaveActivity", "caloriesBurned: " + caloriesBurned);
 
-        // Сохранение активности
+        // Получаем текущую дату в формате "yyyy-MM-dd"
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String currentDate = dateFormat.format(new Date());
+        Log.d("SaveActivity", "currentDate: " + currentDate);
+
+        Log.d("SaveActivity", "distanceDuringTimer: " + distanceDuringTimer);
+        Log.d("SaveActivity", "stepsDuringTimer: " + stepsDuringTimer);
+        Log.d("SaveActivity", "totalDuration: " + totalDuration);
+
+        // Создаем запрос для сохранения активности
         ActivityRequest activityRequest = new ActivityRequest(
                 selectedActivity,
-                totalDistance,
+                distanceDuringTimer, // Используем distanceDuringTimer
                 (int) caloriesBurned,
                 stepsDuringTimer, // Учитываем шаги
-                seconds,
-                new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date())
+                durationInMin, // Общая длительность активности
+                currentDate       // Текущая дата
         );
 
+        // Отправляем запрос на сервер
         FitnessApi api = RetrofitClient.getClient().create(FitnessApi.class);
         Call<ResponseBody> saveCall = api.addActivity(userId, activityRequest);
         saveCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d("SaveActivity", "Response code: " + response.code());
                 if (response.isSuccessful()) {
                     Toast.makeText(requireContext(), "Активность сохранена", Toast.LENGTH_SHORT).show();
+                    Log.d("SaveActivity", "Активность успешно сохранена");
                 } else {
                     Toast.makeText(requireContext(), "Ошибка при сохранении активности", Toast.LENGTH_SHORT).show();
+                    Log.e("SaveActivity", "Ошибка при сохранении активности: " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Toast.makeText(requireContext(), "Ошибка сети", Toast.LENGTH_SHORT).show();
+                Log.e("SaveActivity", "Ошибка сети: " + t.getMessage());
             }
         });
+
+        Log.d("SaveActivity", "Завершение сохранения активности");
     }
 
     // Запуск сигнала (Alarm)

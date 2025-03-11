@@ -45,13 +45,22 @@
             android:exported="false" />
 
         <receiver android:name=".receivers.WorkoutNotificationReceiver" />
-        <activity android:name=".activities.RegisterActivity" />
-        <activity android:name=".activities.AddTrainingActivity" />
-        <activity android:name=".fragments.WeeklyReportActivity"/>
-        <activity android:name=".activities.DashboardActivity" />
-        <activity android:name=".fragments.EditGoalsActivity"/>
-        <activity android:name=".fragments.WorkoutDetailActivity"/>
+        <activity android:name=".activities.RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.AddTrainingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".fragments.WeeklyReportActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.DashboardActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".fragments.EditGoalsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".fragments.WorkoutDetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".fragments.PreferredDaysActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".activities.LoginActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

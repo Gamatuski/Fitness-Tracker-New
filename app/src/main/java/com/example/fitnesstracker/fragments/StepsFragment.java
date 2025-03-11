@@ -3,6 +3,9 @@ package com.example.fitnesstracker.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +29,8 @@ import com.example.fitnesstracker.models.DistanceResponse;
 import com.example.fitnesstracker.models.StepsResponse;
 import com.example.fitnesstracker.models.User;
 import com.example.fitnesstracker.models.UserResponse;
+import com.example.fitnesstracker.utils.DistanceValueFormatter;
+import com.example.fitnesstracker.utils.RoundedBarValueFormatter;
 import com.example.fitnesstracker.utils.StyleTitleText;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -35,12 +40,16 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.renderer.BarChartRenderer;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,7 +66,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
     private int goalDistance = 10;
 
     private LinearLayout stepsLayout, distanceLayout;
-    private ImageView stepsIcon, distanceIcon;
+    private ImageView stepsIcon, distanceIcon, progressCircleImage;
     private View stepsUnderline, distanceUnderline;
     private boolean isShowingSteps = true; // Флаг для отслеживания текущего режима (шаги или расстояние)
 
@@ -67,6 +76,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
 
         // Инициализация элементов UI
         progressCircle = view.findViewById(R.id.progressCircle);
+        progressCircleImage = view.findViewById(R.id.progressCircleImage);
         stepsCountTextView = view.findViewById(R.id.stepsCountTextView);
         barChart = view.findViewById(R.id.barChart);
         titleTextView = view.findViewById(R.id.titleTextView);
@@ -107,6 +117,17 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         // Установка слушателя нажатий на график
         barChart.setOnChartValueSelectedListener(this);
 
+        // Получаем userId из SharedPreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
+        String userId = sharedPreferences.getString("userId", null);
+
+        // Загружаем цели пользователя
+        if (userId != null) {
+            loadUserGoals(userId);
+        } else {
+            Toast.makeText(getContext(), "Пользователь не залогинен", Toast.LENGTH_SHORT).show();
+        }
+
         return view;
     }
 
@@ -116,11 +137,13 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         stepsTextView.setTextColor(getResources().getColor(R.color.purpule));
         distanceTextView.setTextColor(getResources().getColor(R.color.gray));
 
-        goalTextView.setText(goalSteps + " шагов");
+        goalTextView.setText("Цель: " + goalSteps );
 
         // Изменение цвета иконок и подчеркивания
         stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.purpule));
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
+        progressCircleImage.setBackgroundResource(R.drawable.ic_steps_gray);
+
         stepsUnderline.setVisibility(View.VISIBLE);
         distanceUnderline.setVisibility(View.INVISIBLE);
         progressCircle.setProgressDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.circular_progress_bar));
@@ -136,10 +159,12 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         stepsTextView.setTextColor(getResources().getColor(R.color.gray));
         distanceTextView.setTextColor(getResources().getColor(R.color.yellow));
 
-        goalTextView.setText(goalDistance + " км");
+        goalTextView.setText("Цель: " + goalDistance + " км");
         // Изменение цвета иконок и подчеркивания
         stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yellow));
+        progressCircleImage.setBackgroundResource(R.drawable.distance_ic_gray);
+
         stepsUnderline.setVisibility(View.INVISIBLE);
         distanceUnderline.setVisibility(View.VISIBLE);
 
@@ -174,7 +199,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                         stepsDataList = stepsResponse.getSteps();
                         if (stepsDataList != null && stepsDataList.size() == 7) {
                             updateBarChart(convertIntegerToDouble(stepsDataList), true);
-                            updateUIForDay(stepsDataList.get(getCurrentDayIndex()));
+                            updateUIForDay(stepsDataList.get(getCurrentDayIndex()), getCurrentDayIndex()); // Исправлено
                         } else {
                             showError("Неверный формат данных о шагах с сервера.");
                         }
@@ -224,7 +249,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                         distanceData = distanceResponse.getDistance(); // Сохраняем данные о расстоянии
                         if (distanceData != null && distanceData.size() == 7) {
                             updateBarChart(distanceData, false); // Передаём false для расстояния
-                            updateUIForDistance(distanceData.get(getCurrentDayIndex()));
+                            updateUIForDistance(distanceData.get(getCurrentDayIndex()), getCurrentDayIndex()); // Исправлено
                         } else {
                             showError("Неверный формат данных о расстоянии с сервера.");
                         }
@@ -253,20 +278,12 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         });
     }
 
-
     private List<Double> convertIntegerToDouble(List<Integer> intList) {
         List<Double> doubleList = new ArrayList<>();
         for (Integer value : intList) {
             doubleList.add(value.doubleValue());
         }
         return doubleList;
-    }
-
-    // Обновление UI для отображения расстояния
-    private void updateUIForDistance(double distance) {
-        stepsCountTextView.setText(String.format("%.2f км", distance)); // Отображение расстояния
-        int progress = (int) ((distance * 100f) / 10); // Пример: цель - 10 км
-        progressCircle.setProgress(progress); // Обновление прогресс-бара
     }
 
     @Override
@@ -291,16 +308,17 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
 
         YAxis yAxis = barChart.getAxisLeft();
         yAxis.setAxisMinimum(0f); // Минимальное значение
-        yAxis.setAxisMaximum(10000f); // Максимальное значение (можно изменить в зависимости от данных)
-        yAxis.setGranularity(1000f); // Шаг оси Y
-        yAxis.setDrawLabels(true); // Включение подписей оси Y
+        yAxis.setDrawLabels(false); // Включение подписей оси Y
         yAxis.setDrawGridLines(false); // Отключаем сетку оси Y
+        yAxis.setDrawAxisLine(false); // Remove the vertical line next to Y axis
         barChart.getAxisRight().setEnabled(false); // Отключение правой оси Y
 
 
         // Настройка легенды
         barChart.getLegend().setEnabled(false); // Отключение легенды
     }
+
+
 
     // Обновление данных столбчатой диаграммы
     private void updateBarChart(List<Double> data, boolean isSteps) {
@@ -309,8 +327,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
             entries.add(new BarEntry(i, data.get(i).floatValue()));
         }
 
-        // Set dynamic Y-axis maximum
-        float maxY = getMaxValue(data);
+        float maxY = getMaxValue(data, isSteps);
         YAxis yAxis = barChart.getAxisLeft();
         yAxis.setAxisMaximum(maxY);
 
@@ -319,21 +336,50 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         dataSet.setDrawValues(true);
         dataSet.setValueTextSize(12f);
 
+        if (isSteps) {
+            // Создаем и устанавливаем RoundedBarValueFormatter для шагов
+            RoundedBarValueFormatter formatter = new RoundedBarValueFormatter(barChart);
+            dataSet.setValueFormatter(formatter);
+        } else {
+            // Создаем и устанавливаем DistanceValueFormatter для расстояния
+            DistanceValueFormatter distanceFormatter = new DistanceValueFormatter();
+            dataSet.setValueFormatter(distanceFormatter);
+        }
+
         BarData barData = new BarData(dataSet);
         barData.setBarWidth(0.5f);
         barChart.setData(barData);
+
         barChart.invalidate();
     }
 
-    private float getMaxValue(List<Double> data) {
+
+    private float getMaxValue(List<Double> data, boolean isSteps) {
         float maxValue = 0f;
         for (Double value : data) {
             if (value > maxValue) {
                 maxValue = value.floatValue();
             }
         }
-        // Add 20% padding to the max value for better visualization
-        return maxValue * 1.2f;
+
+        if (isSteps) {
+            maxValue = Math.max(maxValue, goalSteps);
+
+            if (maxValue > goalSteps) {
+                return maxValue * 1.2f;
+            } else {
+                return goalSteps * 1.2f;
+            }
+        } else {
+            maxValue = Math.max(maxValue, goalDistance);
+
+            if (maxValue > goalDistance) {
+                return maxValue * 1.2f;
+            } else {
+                return goalDistance * 1.2f;
+            }
+        }
+
     }
 
     // Получение массива подписей дней недели для оси X графика
@@ -351,32 +397,46 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
             if (stepsDataList != null && index < stepsDataList.size()) {
                 updateUIForDay(stepsDataList.get(index), index);
             } else {
-                Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или данные не загружены.");
-                showError("Ошибка при выборе данных на графике.");
+                Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или stepsDataList == null");
+                showError("Ошибка: Неверный индекс выбранного столбца.");
             }
         } else {
             // Если отображается расстояние, используем distanceData
             if (distanceData != null && index < distanceData.size()) {
-                updateUIForDistance(distanceData.get(index));
+                updateUIForDistance(distanceData.get(index), index);
             } else {
-                Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или данные не загружены.");
-                showError("Ошибка при выборе данных на графике.");
+                Log.e("StepsFragment", "Индекс выбранного столбца выходит за пределы данных или distanceData == null");
+                showError("Ошибка: Неверный индекс выбранного столбца.");
             }
         }
     }
 
-    // Обновление UI для отображения шагов и прогресса для выбранного дня
+    // Обновление UI для отображения шагов
+    // Обновление UI для отображения шагов
     private void updateUIForDay(int steps, int dayIndex) {
-        stepsCountTextView.setText(String.valueOf(steps)); // Обновление текста текущих шагов
-        int progress = (int) ((steps * 100f) / goalSteps); // Вычисление прогресса в процентах
-        progressCircle.setProgress(progress); // Обновление прогресс-бара
-        String[] daysOfWeek = getDaysOfWeek();
-        todayTextView.setText(daysOfWeek[dayIndex]); // Обновление TextView с выбранным днем
+        stepsCountTextView.setText(String.valueOf(steps)); // Преобразуем int в String
+        int progress = (int) ((steps * 100f) / goalSteps);
+        progressCircle.setProgress(progress);
+
+        // Обновляем todayTextView
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, dayIndex + 2); // Calendar.MONDAY = 2, Calendar.SUNDAY = 1
+        String dayOfWeek = new SimpleDateFormat("EEEE", new Locale("ru")).format(calendar.getTime());
+        todayTextView.setText(dayOfWeek);
     }
 
     // Перегрузка метода для обновления UI для текущего дня (без индекса, используется при загрузке данных)
-    private void updateUIForDay(int steps) {
-        updateUIForDay(steps, getCurrentDayIndex());
+    // Обновление UI для отображения расстояния
+    private void updateUIForDistance(double distance, int dayIndex) {
+        stepsCountTextView.setText(String.format("%.2f км", distance)); // Отображение расстояния
+        int progress = (int) ((distance * 100f) / goalDistance); // Пример: цель - 10 км
+        progressCircle.setProgress(progress); // Обновление прогресс-бара
+
+        // Обновляем todayTextView
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, dayIndex + 2); // Calendar.MONDAY = 2, Calendar.SUNDAY = 1
+        String dayOfWeek = new SimpleDateFormat("EEEE", new Locale("ru")).format(calendar.getTime());
+        todayTextView.setText(dayOfWeek);
     }
 
 
@@ -415,6 +475,13 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
                     goalSteps = user.getStepsGoal();
                     goalDistance = user.getDistanceGoal();
 
+                    // Устанавливаем значения в goalTextView в зависимости от текущего режима
+                    if (isShowingSteps) {
+                        goalTextView.setText("Цель: " + goalSteps);
+                    } else {
+                        goalTextView.setText("Цель: " + goalDistance + " км");
+                    }
+
                 } else {
                     Toast.makeText(getContext(), "Ошибка при загрузке данных", Toast.LENGTH_SHORT).show();
                 }
@@ -426,4 +493,5 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
             }
         });
     }
+
 }

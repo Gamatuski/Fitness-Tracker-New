@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private ImageView workoutImage, arrowIcon;
     private Button doneButton;
 
+    private LinearLayout preferredDaysLayout;
+
+    private static final int REQUEST_CODE_PREFERRED_DAYS = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +52,14 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         arrowIcon = findViewById(R.id.arrowIcon);
         doneButton = findViewById(R.id.doneButton);
 
+        preferredDaysLayout = findViewById(R.id.preferredDaysLayout);
+
+        // Обработка нажатия на поле "Предпочтительные дни тренировки"
+        findViewById(R.id.preferredDaysLayout).setOnClickListener(v -> {
+            Intent intent = new Intent(this, PreferredDaysActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_PREFERRED_DAYS);
+        });
+
         // Устанавливаем данные Workout
         if (workout != null) {
             if (workout.getImage() != null && workout.getImage().getImageUrl() != null) {
@@ -54,6 +67,8 @@ public class WorkoutDetailActivity extends AppCompatActivity {
                         .load(workout.getImage().getImageUrl())
                         .into(workoutImage);
             }
+
+
 
             // Устанавливаем даты
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());

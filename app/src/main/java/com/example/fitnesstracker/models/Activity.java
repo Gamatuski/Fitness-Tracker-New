@@ -11,7 +11,7 @@ public class Activity {
     private double distance;
     private int calories;
     private int steps;
-    private int duration;
+    private double duration;
     private Date date;
 
     // Геттеры и сеттеры
@@ -49,11 +49,11 @@ public class Activity {
         this.calories = calories;
     }
 
-    public int getDuration() {
+    public double getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(double duration) {
         this.duration = duration;
     }
 

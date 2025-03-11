@@ -6,10 +6,10 @@ public class ActivityRequest {
     private double distance;
     private int calories;
     private int steps;
-    private int duration;
+    private double duration;
     private String date;
 
-    public ActivityRequest(String action, double distance, int calories, int steps, int duration, String date) {
+    public ActivityRequest(String action, double distance, int calories, int steps, double duration, String date) {
         this.action = action;
         this.distance = distance;
         this.calories = calories;

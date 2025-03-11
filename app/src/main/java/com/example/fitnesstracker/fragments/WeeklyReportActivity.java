@@ -1,10 +1,14 @@
 package com.example.fitnesstracker.fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -13,6 +17,8 @@ import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.DistanceResponse;
 import com.example.fitnesstracker.models.StepsResponse;
+import com.example.fitnesstracker.utils.DistanceValueFormatter;
+import com.example.fitnesstracker.utils.RoundedBarValueFormatter;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
@@ -21,9 +27,11 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,6 +40,7 @@ public class WeeklyReportActivity extends AppCompatActivity {
 
     private BarChart stepsBarChart, distanceBarChart;
     private TextView averageStepsTextView, averageDistanceTextView;
+    private boolean isSteps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +78,7 @@ public class WeeklyReportActivity extends AppCompatActivity {
                         // Рассчитаем среднее значение шагов
                         int averageSteps = (int) calculateAverage(stepsData);
                         averageStepsTextView.setText(String.valueOf(averageSteps));
-
+                        isSteps = true;
                         setupBarChart(stepsBarChart, convertToBarEntries(stepsData), "Шаги", averageSteps, 5000, ContextCompat.getColor(WeeklyReportActivity.this, R.color.purpule));
                     } else {
                         Toast.makeText(WeeklyReportActivity.this, "Неверный формат данных о шагах", Toast.LENGTH_SHORT).show();
@@ -100,6 +109,7 @@ public class WeeklyReportActivity extends AppCompatActivity {
                         averageDistanceTextView.setText(String.format("%.2f км", averageDistance));
 
                         // Настройка BarChart для расстояния
+                        isSteps = false;
                         setupBarChart(distanceBarChart, convertToBarEntries(distanceData), "Расстояние", averageDistance, 10.0, ContextCompat.getColor(WeeklyReportActivity.this, R.color.yellow));
                     } else {
                         Toast.makeText(WeeklyReportActivity.this, "Неверный формат данных о расстоянии", Toast.LENGTH_SHORT).show();
@@ -140,6 +150,10 @@ public class WeeklyReportActivity extends AppCompatActivity {
 
         BarData barData = new BarData(dataSet);
         barChart.setData(barData);
+        barChart.getDescription().setEnabled(false);
+
+        // Отключаем легенду
+        barChart.getLegend().setEnabled(false);
 
         // Настройка оси X
         XAxis xAxis = barChart.getXAxis();
@@ -155,24 +169,36 @@ public class WeeklyReportActivity extends AppCompatActivity {
         yAxis.setAxisMaximum((float) (goalValue * 1.2)); // Добавляем 20% отступа
         yAxis.setGranularity(1f);
         yAxis.setDrawGridLines(false); // Отключаем сетку на оси Y
+        yAxis.setDrawLabels(false); // Убираем значения оси Y
 
         // Отключаем правую ось Y
         barChart.getAxisRight().setEnabled(false);
 
         // Добавляем пунктирные линии
-        LimitLine averageLine = new LimitLine((float) averageValue, "Среднее");
+        LimitLine averageLine = new LimitLine((float) averageValue);
         averageLine.setLineColor(Color.GRAY);
         averageLine.setLineWidth(1f);
         averageLine.enableDashedLine(10f, 10f, 0f); // Пунктирная линия
         yAxis.addLimitLine(averageLine);
 
-        LimitLine goalLine = new LimitLine((float) goalValue, "Цель");
+        LimitLine goalLine = new LimitLine((float) goalValue);
         goalLine.setLineColor(android.graphics.Color.RED);
         goalLine.setLineWidth(1f);
         goalLine.enableDashedLine(10f, 10f, 0f); // Пунктирная линия
         yAxis.addLimitLine(goalLine);
 
+        if (isSteps) {
+            // Создаем и устанавливаем RoundedBarValueFormatter для шагов
+            RoundedBarValueFormatter formatter = new RoundedBarValueFormatter(barChart);
+            dataSet.setValueFormatter(formatter);
+        } else {
+            // Создаем и устанавливаем DistanceValueFormatter для расстояния
+            DistanceValueFormatter distanceFormatter = new DistanceValueFormatter();
+            dataSet.setValueFormatter(distanceFormatter);
+        }
+
         // Обновление графика
         barChart.invalidate();
     }
+
 }

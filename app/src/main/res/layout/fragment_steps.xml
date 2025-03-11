@@ -17,8 +17,8 @@
 
     <RelativeLayout
         android:id="@+id/progress_layout"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         android:layout_gravity="center">
 
         <!-- ProgressBar -->
@@ -34,6 +34,7 @@
 
         <!-- Иконка шагов -->
         <ImageView
+            android:id="@+id/progressCircleImage"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_above="@+id/stepsCountTextView"
@@ -134,7 +135,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:padding="8dp"
-            android:layout_marginLeft="32dp">
+            android:layout_marginLeft="46dp">
 
             <ImageView
                 android:id="@+id/distanceIcon"
@@ -166,7 +167,5 @@
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_marginTop="16dp"
-        />
+        android:layout_height="250dp" />
 </LinearLayout>
