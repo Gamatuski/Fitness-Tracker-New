@@ -1,171 +1,180 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="@color/smoky_white">
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:text="Fitness Tracker"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <RelativeLayout
-        android:id="@+id/progress_layout"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_gravity="center">
-
-        <!-- ProgressBar -->
-        <ProgressBar
-            android:id="@+id/progressCircle"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/circular_shape"
-            android:indeterminate="false"
-            android:progressDrawable="@drawable/circular_progress_bar"
-            android:textAlignment="center" />
-
-        <!-- Иконка шагов -->
-        <ImageView
-            android:id="@+id/progressCircleImage"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_above="@+id/stepsCountTextView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_gravity="center"
-            android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_steps" />
-
-        <TextView
-            android:id="@+id/stepsCountTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:text="---"
-            android:textColor="#000"
-            android:textSize="40sp" />
-
-        <TextView
-            android:id="@+id/todayTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/stepsCountTextView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="-20dp"
-            android:gravity="center"
-            android:text="Сегодня"
-            android:textColor="@color/gray"
-            android:textSize="14sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/goalTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/stepsCountTextView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="-39dp"
-            android:gravity="center"
-            android:text="Цель: 5000"
-            android:textColor="@color/gray"
-            android:textSize="14sp" />
-    </RelativeLayout>
-
-    <!-- Иконки для переключения между шагами и расстоянием -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Иконка шагов -->
-        <LinearLayout
-            android:id="@+id/stepsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp">
+        <RelativeLayout
+            android:id="@+id/progress_layout"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center">
 
-            <ImageView
-                android:id="@+id/stepsIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_steps"
-                app:tint="@color/purpule" />
-
-            <TextView
-                android:id="@+id/stepsTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Шаги"
-                android:textColor="@color/purpule"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-
-            <!-- Подчеркивание для выбранной иконки -->
-            <View
-                android:id="@+id/stepsUnderline"
+            <!-- ProgressBar -->
+            <ProgressBar
+                android:id="@+id/progressCircle"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/purpule"
-                android:visibility="visible"/>
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:background="@drawable/circular_shape"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/circular_progress_bar"
+                android:textAlignment="center" />
 
-        <!-- Иконка расстояния -->
-        <LinearLayout
-            android:id="@+id/distanceLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp"
-            android:layout_marginLeft="46dp">
-
+            <!-- Иконка шагов -->
             <ImageView
-                android:id="@+id/distanceIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/distance_ic"
-                />
+                android:id="@+id/progressCircleImage"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_above="@+id/stepsCountTextView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_steps_gray" />
 
             <TextView
-                android:id="@+id/distanceTextView"
+                android:id="@+id/stepsCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Расстояние"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="---"
+                android:textColor="#000"
+                android:textSize="40sp" />
+
+            <TextView
+                android:id="@+id/todayTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/stepsCountTextView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="-20dp"
+                android:gravity="center"
+                android:text="Сегодня"
                 android:textColor="@color/gray"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
 
-            <!-- Подчеркивание для выбранной иконки -->
-            <View
-                android:id="@+id/distanceUnderline"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/yellow"
-                android:visibility="invisible"/>
+            <TextView
+                android:id="@+id/goalTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/stepsCountTextView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="-39dp"
+                android:gravity="center"
+                android:text="Цель: 5000"
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <!-- Иконки для переключения между шагами и расстоянием -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
+
+            <!-- Иконка шагов -->
+            <LinearLayout
+                android:id="@+id/stepsLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/stepsIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_steps"
+                    app:tint="@color/purpule" />
+
+                <TextView
+                    android:id="@+id/stepsTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Шаги"
+                    android:textColor="@color/purpule"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <!-- Подчеркивание для выбранной иконки -->
+                <View
+                    android:id="@+id/stepsUnderline"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/purpule"
+                    android:visibility="visible"/>
+            </LinearLayout>
+
+            <!-- Иконка расстояния -->
+            <LinearLayout
+                android:id="@+id/distanceLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp"
+                android:layout_marginLeft="46dp">
+
+                <ImageView
+                    android:id="@+id/distanceIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/distance_ic"
+                    />
+
+                <TextView
+                    android:id="@+id/distanceTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Расстояние"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <!-- Подчеркивание для выбранной иконки -->
+                <View
+                    android:id="@+id/distanceUnderline"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/yellow"
+                    android:visibility="invisible"/>
+            </LinearLayout>
         </LinearLayout>
+
+        <!-- BarChart -->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
     </LinearLayout>
 
-    <!-- BarChart -->
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/barChart"
-        android:layout_width="match_parent"
-        android:layout_height="250dp" />
-</LinearLayout>
+    <ImageView
+        android:id="@+id/shareButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_share"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground"/>
+</FrameLayout>

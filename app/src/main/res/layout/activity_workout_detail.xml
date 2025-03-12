@@ -48,9 +48,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Дата начала: 10.03.2025"
-                        android:textSize="14sp"
-                        />
+                        android:text="Дата начала:"
+                        android:textSize="14sp" />
 
                     <EditText
                         android:id="@+id/currentDate"
@@ -58,9 +57,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:hint="Сегодня: 10.03.2025"
+                        android:hint="10.03.2025"
                         android:textSize="14sp"
-                        android:background="@null"/>
+                        android:background="@null" />
                 </LinearLayout>
 
                 <!-- Разделительная линия -->
@@ -76,14 +75,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginVertical="4dp">
-                <!-- Время уведомления -->
+                    <!-- Время уведомления -->
                     <TextView
                         android:id="@+id/notificationTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Время уведомления:"
-                        android:textSize="14sp"
-                        />
+                        android:textSize="14sp" />
                     <EditText
                         android:id="@+id/notificationTime"
                         android:layout_width="0dp"
@@ -92,8 +90,7 @@
                         android:gravity="end"
                         android:hint="18:00"
                         android:textSize="14sp"
-                        android:background="@null"/>
-
+                        android:background="@null" />
                 </LinearLayout>
 
                 <!-- Разделительная линия -->
@@ -105,49 +102,77 @@
                     android:background="@color/gray" />
 
                 <!-- Предпочтительные дни тренировки -->
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/preferredDaysLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
                     android:layout_marginVertical="4dp">
 
                     <TextView
-                        android:id="@+id/preferredDays"
+                        android:id="@+id/preferredDaysText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Предпочтительные дни тренировки"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/preferredDays"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:text="Вторник, Четверг, Суббота"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/preferredDaysText"
+                        app:layout_constraintEnd_toStartOf="@id/arrowIcon" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Вторник, Четверг, Суббота"
-                            android:textColor="@color/gray"
-                            android:textSize="12sp" />
+                    <ImageView
+                        android:id="@+id/arrowIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_right"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <ImageView
-                            android:id="@+id/arrowIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_arrow_right" />
-                    </LinearLayout>
+                <!-- Разделительная линия -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/gray" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginVertical="4dp">
+                    <!-- Время уведомления -->
+                    <TextView
+                        android:id="@+id/action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Бег"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/difficultyText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="Легкий"
+                        android:textSize="14sp"
+                        android:background="@null" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <!-- Предупреждение -->
-
-    <!-- Кнопка "Готово" -->
     <TextView
         android:id="@+id/warningText"
         android:layout_width="0dp"

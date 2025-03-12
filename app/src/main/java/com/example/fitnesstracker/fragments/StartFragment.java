@@ -1,6 +1,7 @@
 package com.example.fitnesstracker.fragments;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -27,7 +28,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -110,6 +114,12 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     private static final int ACTIVITY_RECOGNITION_REQUEST_CODE = 200;
     private boolean isFragmentAttached = false;
     private double totalDistance;
+
+    private FrameLayout mapContainer; // Контейнер для карты
+    private ViewGroup.LayoutParams originalMapParams; // Исходные параметры макета карты
+    private boolean isMapExpanded = false; // Флаг, указывающий, развернута ли карта
+    private ImageView closeButton; // Кнопка закрытия развернутой карты
+
 
 
     private final ServiceConnection connection = new ServiceConnection() {
@@ -198,7 +208,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         timerTextView = view.findViewById(R.id.timerTextView);
         minusButton = view.findViewById(R.id.minusButton);
         plusButton = view.findViewById(R.id.plusButton);
-        titleTextView = view.findViewById(R.id.titleTextView);
 
         // Инициализация выпадающего списка
         activitySpinner = view.findViewById(R.id.activitySpinner);
@@ -210,9 +219,6 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         activitySpinner.setAdapter(adapter);
 
-        // Стилизация заголовка
-        StyleTitleText styleTitleText = new StyleTitleText();
-        styleTitleText.styleTitleText(titleTextView);
 
         // Инициализация кнопки "Начать"
         startButton = view.findViewById(R.id.startButton);
@@ -252,6 +258,26 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         // Запрос разрешений
         requestLocationPermissions();
 
+        mapContainer = view.findViewById(R.id.map_container); // Находим контейнер карты в макете
+        closeButton = view.findViewById(R.id.close_button); // Находим кнопку закрытия в макете
+        closeButton.setVisibility(View.GONE); // Initially hide the close button // Скрываем кнопку закрытия при запуске
+
+        // Store original map layout parameters
+        originalMapParams = mapContainer.getLayoutParams(); // Сохраняем исходные параметры макета
+
+        // Set click listener for map expansion
+        mapContainer.setOnClickListener(v -> { // Устанавливаем слушатель кликов на контейнер карты
+            if (!isMapExpanded) { // Если карта не развернута
+                Log.d("MapClick", "Map container clicked!");
+                expandMap(); // Разворачиваем карту
+            }
+        });
+
+        // Set click listener for close button
+        closeButton.setOnClickListener(v -> { // Устанавливаем слушатель кликов на кнопку закрытия
+            collapseMap(); // Сворачиваем карту
+        });
+
 
         return view;
     }
@@ -272,8 +298,10 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     );
 
     @Override
-    public void onMapReady(GoogleMap map) {
-        googleMap = map;
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap; // Сохраняем ссылку на GoogleMap
+
+
 
         // Настройка карты
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -282,6 +310,8 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         } else {
             requestLocationPermissions(); // Запросить разрешения, если они не предоставлены
         }
+
+        // Теперь клики должны передаваться на mapContainer
     }
 
     @Override
@@ -687,6 +717,82 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         if (dayIndex == -1) dayIndex = 6;
 
         return dayIndex;
+    }
+
+    private void expandMap() {
+        isMapExpanded = true; // Устанавливаем флаг, что карта развернута
+        closeButton.setVisibility(View.VISIBLE); // Показываем кнопку закрытия
+
+        // Store original values for animation
+        int originalWidth = mapContainer.getWidth();
+        int originalHeight = mapContainer.getHeight();
+
+        // Calculate target values for full-screen expansion
+        int targetWidth = getView().getWidth();
+        int targetHeight = getView().getHeight();
+
+        // Create width animator
+        ValueAnimator widthAnimator = ValueAnimator.ofInt(originalWidth, targetWidth);
+        widthAnimator.addUpdateListener(animation -> {
+            int newWidth = (int) animation.getAnimatedValue();
+            mapContainer.getLayoutParams().width = newWidth;
+            mapContainer.requestLayout();
+        });
+
+        // Create height animator
+        ValueAnimator heightAnimator = ValueAnimator.ofInt(originalHeight, targetHeight);
+        heightAnimator.addUpdateListener(animation -> {
+            int newHeight = (int) animation.getAnimatedValue();
+            mapContainer.getLayoutParams().height = newHeight;
+            mapContainer.requestLayout();
+        });
+
+        // Set animator duration
+        long animationDuration = 300;
+        widthAnimator.setDuration(animationDuration);
+        heightAnimator.setDuration(animationDuration);
+
+        // Start the animators
+        widthAnimator.start();
+        heightAnimator.start();
+    }
+
+    private void collapseMap() {
+        isMapExpanded = false; // Устанавливаем флаг, что карта свернута
+        closeButton.setVisibility(View.GONE); // Скрываем кнопку закрытия
+
+        // Store current values for animation
+        int currentWidth = mapContainer.getWidth();
+        int currentHeight = mapContainer.getHeight();
+
+        // Calculate target values for original size
+        int targetWidth = originalMapParams.width;
+        int targetHeight = originalMapParams.height;
+
+        // Create width animator
+        ValueAnimator widthAnimator = ValueAnimator.ofInt(currentWidth, targetWidth);
+        widthAnimator.addUpdateListener(animation -> {
+            int newWidth = (int) animation.getAnimatedValue();
+            mapContainer.getLayoutParams().width = newWidth;
+            mapContainer.requestLayout();
+        });
+
+        // Create height animator
+        ValueAnimator heightAnimator = ValueAnimator.ofInt(currentHeight, targetHeight);
+        heightAnimator.addUpdateListener(animation -> {
+            int newHeight = (int) animation.getAnimatedValue();
+            mapContainer.getLayoutParams().height = newHeight;
+            mapContainer.requestLayout();
+        });
+
+        // Set animator duration
+        long animationDuration = 300;
+        widthAnimator.setDuration(animationDuration);
+        heightAnimator.setDuration(animationDuration);
+
+        // Start the animators
+        widthAnimator.start();
+        heightAnimator.start();
     }
 
 

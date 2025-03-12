@@ -1,14 +1,14 @@
 package com.example.fitnesstracker.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,9 +20,7 @@ import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.ActivityRequest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,10 +29,12 @@ import retrofit2.Response;
 
 public class AddTrainingActivity extends AppCompatActivity {
 
-    private TextView cancelTextView, saveTextView;
+    private TextView cancelTextView, saveTextView, actionTextView;
     private EditText  distanceEditText, caloriesEditText, stepsEditText, durationEditText, startDateEditText;
-    private Spinner actionSpinner;
     private boolean isFormatting;
+    private static final int REQUEST_ACTIVITY_CODE = 1;
+
+    private LinearLayout actionLayout;
 
 
     @Override
@@ -45,16 +45,9 @@ public class AddTrainingActivity extends AppCompatActivity {
         // Инициализация элементов UI
         cancelTextView = findViewById(R.id.cancelTextView);
         saveTextView = findViewById(R.id.saveTextView);
-        actionSpinner = findViewById(R.id.actionSpinner);
+        actionLayout = findViewById(R.id.actionLayout);
+        actionTextView = findViewById(R.id.actionTextView);
 
-        // Создание адаптера для Spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.activities_array,
-                android.R.layout.simple_spinner_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        actionSpinner.setAdapter(adapter);
 
         distanceEditText = findViewById(R.id.distanceEditText);
         caloriesEditText = findViewById(R.id.caloriesEditText);
@@ -149,6 +142,20 @@ public class AddTrainingActivity extends AppCompatActivity {
             }
         });
 
+        // Обработка нажатия на поле "Предпочтительные дни тренировки"
+        findViewById(R.id.actionLayout).setOnClickListener(v -> {
+            Intent intent = new Intent(this, SelectActionActivity.class);
+
+            // Получаем текущие выбранные дни из TextView
+            TextView actionTextView = findViewById(R.id.actionTextView);
+            String selectedActionText = actionTextView.getText().toString();
+
+
+            // Передаем выбранные дни в Intent
+            intent.putExtra("selectedAction",selectedActionText);
+            startActivityForResult(intent, REQUEST_ACTIVITY_CODE);
+        });
+
         // Обработчик нажатия на "Отменить"
         cancelTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,17 +175,42 @@ public class AddTrainingActivity extends AppCompatActivity {
 
     private void saveTrainingData() {
         // Получение выбранного действия из Spinner
-        String action = actionSpinner.getSelectedItem().toString();
-        double distance = Double.parseDouble(distanceEditText.getText().toString());
-        int calories = Integer.parseInt(caloriesEditText.getText().toString());
-        int steps = Integer.parseInt(stepsEditText.getText().toString());
-        int duration = Integer.parseInt(durationEditText.getText().toString());
+        String action = actionTextView.getText().toString();
         String date = startDateEditText.getText().toString();
 
         // Проверка обязательных полей
         if (action.isEmpty() || date.isEmpty()) {
             Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        // Проверка и преобразование числовых полей
+        double distance;
+        try {
+            distance = Double.parseDouble(distanceEditText.getText().toString());
+        } catch (NumberFormatException e) {
+            distance = 0.0; // Устанавливаем значение по умолчанию
+        }
+
+        int calories;
+        try {
+            calories = Integer.parseInt(caloriesEditText.getText().toString());
+        } catch (NumberFormatException e) {
+            calories = 0; // Устанавливаем значение по умолчанию
+        }
+
+        int steps;
+        try {
+            steps = Integer.parseInt(stepsEditText.getText().toString());
+        } catch (NumberFormatException e) {
+            steps = 0; // Устанавливаем значение по умолчанию
+        }
+
+        Double duration;
+        try {
+            duration = Double.parseDouble(durationEditText.getText().toString());
+        } catch (NumberFormatException e) {
+            duration = 0.0; // Устанавливаем значение по умолчанию
         }
 
         // Получаем userId из SharedPreferences
@@ -199,6 +231,7 @@ public class AddTrainingActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(AddTrainingActivity.this, "Тренировка сохранена", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
                     finish();
                 } else {
                     Toast.makeText(AddTrainingActivity.this, "Ошибка при сохранении тренировки", Toast.LENGTH_SHORT).show();
@@ -210,5 +243,20 @@ public class AddTrainingActivity extends AppCompatActivity {
                 Toast.makeText(AddTrainingActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ACTIVITY_CODE && resultCode == RESULT_OK) {
+            // Получаем выбранную активность из Intent
+            String selectedAction = data.getStringExtra("selectedAction");
+
+            // Обновляем поле actionTextView
+            if (selectedAction != null) {
+                actionTextView.setText(selectedAction);
+            }
+        }
     }
 }

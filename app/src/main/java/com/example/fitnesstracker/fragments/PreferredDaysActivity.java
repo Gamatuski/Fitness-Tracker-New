@@ -29,9 +29,17 @@ public class PreferredDaysActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferred_days);
 
+        // Получаем выбранные дни из Intent
+        List<String> initialSelectedDays = getIntent().getStringArrayListExtra("selectedDays");
+
         RecyclerView daysRecyclerView = findViewById(R.id.daysRecyclerView);
         daysRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Передаем начальные выбранные дни в адаптер
         adapter = new DaysAdapter(days);
+        if (initialSelectedDays != null) {
+            adapter.setSelectedDays(initialSelectedDays);
+        }
         daysRecyclerView.setAdapter(adapter);
 
         Button doneButton = findViewById(R.id.doneButton);

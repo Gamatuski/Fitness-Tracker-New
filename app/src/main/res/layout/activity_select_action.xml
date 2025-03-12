@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- CardView для списка дней недели -->
+    <!-- CardView для списка активностей -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/daysCardView"
+        android:id="@+id/actionsCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/daysRecyclerView"
+            android:id="@+id/actionsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp" />
@@ -38,6 +38,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

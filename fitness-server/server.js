@@ -262,13 +262,40 @@ app.post('/users/:userId/activities', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Пользователь не найден' });
         }
 
-        user.activities.push({ action, distance, calories, steps, duration, date });
+        // 1. Date Parsing
+        let parsedDate;
+        try {
+            const dateParts = date.split('.');
+            // month is 0-indexed, that's why we subtract 1
+            parsedDate = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+            if (isNaN(parsedDate)) {
+                throw new Error("Invalid date format");
+            }
+        } catch (error) {
+            return res.status(400).json({ success: false, message: 'Неверный формат даты. Ожидается ДД.ММ.ГГГГ' });
+        }
 
+
+
+        const newActivity = {
+            action,
+            distance,
+            calories,
+            steps,
+            duration,
+            date: parsedDate // Use the parsed date
+        };
+
+        user.activities.push(newActivity);
+
+        // 3. Save the user
+        await user.save();
 
         res.status(201).json({ success: true, message: 'Активность добавлена' });
+
     } catch (err) {
         console.error('Ошибка при добавлении активности:', err);
-        res.status(500).json({ success: false, message: 'Ошибка сервера' });
+        res.status(500).json({ success: false, message: 'Ошибка сервера', error: err.message }); // Include error message
     }
 });
 

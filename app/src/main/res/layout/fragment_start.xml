@@ -3,94 +3,117 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="@color/smoky_white"
     android:fitsSystemWindows="true">
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_marginBottom="16dp"
-        android:text="Fitness Tracker"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:elevation="4dp"/>
-
     <!-- Карта -->
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <FrameLayout
+        android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="100dp"
+        android:layout_weight="1">
 
-    <!-- Надпись "Ваша цель" -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ваша цель"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp" />
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <!-- Таймер -->
+        <!-- Кнопка закрытия -->
+        <ImageView
+            android:id="@+id/close_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_close"
+            android:background="@drawable/circle_black"
+            android:visibility="gone"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:padding="8dp"
+            android:elevation="4dp"
+            android:contentDescription="Закрыть карту"
+            app:tint="@android:color/white" />
+
+    </FrameLayout>
+
+    <!-- Контейнер для остального контента -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="16dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Кнопка "-" -->
-        <ImageButton
-            android:id="@+id/minusButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_minus"
-            android:background="@drawable/circle_black"
-            android:contentDescription="@string/minus_button"
-            app:tint="@android:color/white" />
-
-        <!-- Таймер -->
+        <!-- Надпись "Ваша цель" -->
         <TextView
-            android:id="@+id/timerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00:00"
-            android:textSize="24sp"
-            android:layout_marginHorizontal="16dp" />
+            android:text="Ваша цель"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
 
-        <!-- Кнопка "+" -->
-        <ImageButton
-            android:id="@+id/plusButton"
-            android:layout_width="48dp"
+        <!-- Таймер -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <!-- Кнопка "-" -->
+            <ImageButton
+                android:id="@+id/minusButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_minus"
+                android:background="@drawable/circle_black"
+                android:contentDescription="@string/minus_button"
+                app:tint="@android:color/white" />
+
+            <!-- Таймер -->
+            <TextView
+                android:id="@+id/timerTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="24sp"
+                android:layout_marginHorizontal="16dp" />
+
+            <!-- Кнопка "+" -->
+            <ImageButton
+                android:id="@+id/plusButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_plus"
+                android:background="@drawable/circle_black"
+                android:contentDescription="@string/plus_button"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Выпадающий список -->
+        <Spinner
+            android:id="@+id/activitySpinner"
+            android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:src="@drawable/ic_plus"
-            android:background="@drawable/circle_black"
-            android:contentDescription="@string/plus_button"
-            app:tint="@android:color/white" />
-    </LinearLayout>
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/edittext_background" />
 
-    <!-- Выпадающий список -->
-    <Spinner
-        android:id="@+id/activitySpinner"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/edittext_background"/>
+    </LinearLayout>
 
     <!-- Кнопка "Начать" -->
     <Button
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:background="@drawable/rounded_button"
         android:backgroundTint="@color/purpule"
         android:padding="16dp"
         android:text="Начать"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"/>
+
 </LinearLayout>

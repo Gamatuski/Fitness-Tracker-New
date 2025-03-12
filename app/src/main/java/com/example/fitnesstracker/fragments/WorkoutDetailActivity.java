@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.fitnesstracker.R;
@@ -21,17 +23,20 @@ import com.example.fitnesstracker.models.Workout;
 import com.example.fitnesstracker.receivers.WorkoutNotificationReceiver;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class WorkoutDetailActivity extends AppCompatActivity {
 
     private Workout workout;
-    private TextView startDate, currentDate, notificationTime, preferredDays;
+    private TextView startDate, currentDate, notificationTime, preferredDays, action, difficultyText;
     private ImageView workoutImage, arrowIcon;
     private Button doneButton;
 
-    private LinearLayout preferredDaysLayout;
+    private ConstraintLayout preferredDaysLayout;
 
     private static final int REQUEST_CODE_PREFERRED_DAYS = 1;
 
@@ -51,12 +56,22 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         workoutImage = findViewById(R.id.workoutImage);
         arrowIcon = findViewById(R.id.arrowIcon);
         doneButton = findViewById(R.id.doneButton);
+        action = findViewById(R.id.action);
+        difficultyText = findViewById(R.id.difficultyText);
 
         preferredDaysLayout = findViewById(R.id.preferredDaysLayout);
 
         // Обработка нажатия на поле "Предпочтительные дни тренировки"
         findViewById(R.id.preferredDaysLayout).setOnClickListener(v -> {
             Intent intent = new Intent(this, PreferredDaysActivity.class);
+
+            // Получаем текущие выбранные дни из TextView
+            TextView preferredDaysTextView = findViewById(R.id.preferredDays);
+            String selectedDaysText = preferredDaysTextView.getText().toString();
+            List<String> selectedDays = Arrays.asList(selectedDaysText.split(", "));
+
+            // Передаем выбранные дни в Intent
+            intent.putStringArrayListExtra("selectedDays", new ArrayList<>(selectedDays));
             startActivityForResult(intent, REQUEST_CODE_PREFERRED_DAYS);
         });
 
@@ -73,17 +88,41 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             // Устанавливаем даты
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
             String currentDateStr = dateFormat.format(Calendar.getInstance().getTime());
-            startDate.setText("Дата начала: " + currentDateStr);
-            currentDate.setText("Сегодня: " + currentDateStr);
+            startDate.setText(currentDateStr);
+            currentDate.setText(currentDateStr);
 
             // Устанавливаем время уведомления по умолчанию
-            notificationTime.setText("Время уведомления: 18:00");
+            notificationTime.setText("18:00");
 
             // Устанавливаем предпочтительные дни
-            preferredDays.setText("Предпочтительные дни: Вторник, Четверг, Суббота");
+            preferredDays.setText("Вторник, Четверг, Суббота");
+
+            action.setText(workout.getAction());
+            difficultyText.setText(workout.getDifficulty());
 
             // Обработка нажатия на кнопку "Готово"
             doneButton.setOnClickListener(v -> scheduleNotifications());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_PREFERRED_DAYS && resultCode == RESULT_OK) {
+            // Получаем выбранные дни из Intent
+            List<String> selectedDays = data.getStringArrayListExtra("selectedDays");
+
+            // Обновляем поле preferredDays
+            TextView preferredDaysTextView = findViewById(R.id.preferredDays);
+            if (selectedDays != null && !selectedDays.isEmpty()) {
+                // Преобразуем список в строку с разделителем ", "
+                String selectedDaysText = TextUtils.join(", ", selectedDays);
+                preferredDaysTextView.setText(selectedDaysText);
+            } else {
+                // Если ничего не выбрано, можно установить текст по умолчанию
+                preferredDaysTextView.setText("Дни не выбраны");
+            }
         }
     }
 

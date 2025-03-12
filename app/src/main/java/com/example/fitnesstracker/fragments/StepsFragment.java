@@ -1,12 +1,20 @@
 package com.example.fitnesstracker.fragments;
 
+import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +25,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.viewmodel.CreationExtras;
 
@@ -45,6 +55,10 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,9 +80,10 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
     private int goalDistance = 10;
 
     private LinearLayout stepsLayout, distanceLayout;
-    private ImageView stepsIcon, distanceIcon, progressCircleImage;
+    private ImageView stepsIcon, distanceIcon, progressCircleImage, shareButton;
     private View stepsUnderline, distanceUnderline;
     private boolean isShowingSteps = true; // Флаг для отслеживания текущего режима (шаги или расстояние)
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,9 +94,9 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         progressCircleImage = view.findViewById(R.id.progressCircleImage);
         stepsCountTextView = view.findViewById(R.id.stepsCountTextView);
         barChart = view.findViewById(R.id.barChart);
-        titleTextView = view.findViewById(R.id.titleTextView);
         todayTextView = view.findViewById(R.id.todayTextView);
         goalTextView = view.findViewById(R.id.goalTextView);
+        shareButton = view.findViewById(R.id.shareButton);
 
         stepsTextView = view.findViewById(R.id.stepsTextView);
         distanceTextView = view.findViewById(R.id.distanceTextView);
@@ -107,9 +122,10 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
             }
         });
 
-        // Стилизация заголовка
-        StyleTitleText styleTitleText = new StyleTitleText();
-        styleTitleText.styleTitleText(titleTextView);
+        // Обработка нажатия на кнопку "Поделиться"
+        shareButton.setOnClickListener(v -> {
+            shareScreenshot();
+        });
 
         // Настройка графика
         setupBarChart();
@@ -142,7 +158,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         // Изменение цвета иконок и подчеркивания
         stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.purpule));
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
-        progressCircleImage.setBackgroundResource(R.drawable.ic_steps_gray);
+        progressCircleImage.setImageResource (R.drawable.ic_steps_gray);
 
         stepsUnderline.setVisibility(View.VISIBLE);
         distanceUnderline.setVisibility(View.INVISIBLE);
@@ -163,7 +179,7 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         // Изменение цвета иконок и подчеркивания
         stepsIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
         distanceIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.yellow));
-        progressCircleImage.setBackgroundResource(R.drawable.distance_ic_gray);
+        progressCircleImage.setImageResource (R.drawable.distance_ic_gray);
 
         stepsUnderline.setVisibility(View.INVISIBLE);
         distanceUnderline.setVisibility(View.VISIBLE);
@@ -172,6 +188,59 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
 
         // Обновление данных (расстояние)
         loadDistanceDataFromDatabase();
+    }
+
+
+    private void shareScreenshot() {
+        View rootView = requireView();
+
+
+        // Создаем Bitmap с размерами view
+        Bitmap bitmap = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        rootView.draw(canvas);
+        rootView.setBackgroundColor(Color.WHITE);
+
+        if (bitmap == null) {
+            Log.e("StepsFragment", "Failed to create bitmap.");
+            Toast.makeText(getContext(), "Не удалось создать скриншот", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String fileName = "fitness_progress_" + System.currentTimeMillis() + ".png";
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+        values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000);
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+
+        Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        try {
+            Uri uri = requireContext().getContentResolver().insert(contentUri, values);
+            if (uri == null) {
+                throw new IOException("Failed to insert MediaStore record");
+            }
+
+            try (OutputStream outputStream = requireContext().getContentResolver().openOutputStream(uri)) {
+                if (outputStream == null) {
+                    throw new IOException("Failed to open output stream.");
+                }
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            }
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/png");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Посмотрите на мой прогресс в фитнесе!");
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(shareIntent, "Поделиться прогрессом"));
+
+        } catch (IOException e) {
+            Log.e("StepsFragment", "Error saving screenshot to MediaStore", e);
+            Toast.makeText(getContext(), "Не удалось сохранить скриншот", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

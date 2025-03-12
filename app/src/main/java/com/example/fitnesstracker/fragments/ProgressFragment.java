@@ -9,9 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -27,6 +29,7 @@ import com.example.fitnesstracker.models.Activity;
 import com.example.fitnesstracker.models.ActivityResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +45,9 @@ public class ProgressFragment extends Fragment {
     private RecyclerView activitiesRecyclerView;
     private ActivitiesAdapter activitiesAdapter;
     private FloatingActionButton addTrainingButton;
-    private Call<List<Activity>> call; // Объе
+    private Call<List<Activity>> call;
+    private static final int ADD_TRAINING_REQUEST_CODE = 1;
+    public static final int RESULT_OK = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,7 +64,7 @@ public class ProgressFragment extends Fragment {
         addTrainingButton = view.findViewById(R.id.addTrainingButton);
         addTrainingButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddTrainingActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, ADD_TRAINING_REQUEST_CODE); // Use startActivityForResult
         });
 
         // Иконка для удаления (если нужно)
@@ -123,6 +128,18 @@ public class ProgressFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_TRAINING_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // Обновляем UI
+                loadActivities();
+            }
+        }
+    }
+
 
 
     public static class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolder> {
@@ -183,7 +200,14 @@ public class ProgressFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             Activity activity = activities.get(position);
             holder.actionTextView.setText(activity.getAction());
-            holder.durationTextView.setText(activity.getDuration() + " мин");
+
+            // Устанавливаем иконку в зависимости от названия активности
+            int iconResId = getIconForActivity(activity.getAction());
+            holder.iconImageView.setImageResource(iconResId);
+
+            double duration = activity.getDuration();
+            DecimalFormat durationFormat = new DecimalFormat("#.##");
+            holder.durationTextView.setText(durationFormat.format(duration) + " мин");
 
             // Форматирование отображения расстояния
             double distance = activity.getDistance();
@@ -224,6 +248,7 @@ public class ProgressFragment extends Fragment {
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public TextView actionTextView, durationTextView, distanceTextView, caloriesTextView, dateTextView;
+            public ImageView iconImageView;
 
             public ViewHolder(View itemView) {
                 super(itemView);
@@ -232,6 +257,22 @@ public class ProgressFragment extends Fragment {
                 distanceTextView = itemView.findViewById(R.id.distanceTextView);
                 caloriesTextView = itemView.findViewById(R.id.caloriesTextView);
                 dateTextView = itemView.findViewById(R.id.dateTextView);
+                iconImageView = itemView.findViewById(R.id.iconImageView);
+            }
+        }
+
+        private int getIconForActivity(String activityName) {
+            switch (activityName) {
+                case "Бег":
+                    return R.drawable.ic_runnuig_man; // Иконка для бега
+                case "Прогулка":
+                    return R.drawable.ic_walking_man; // Иконка для прогулки
+                case "Северная ходьба":
+                    return R.drawable.ic_nord_walking_man; // Иконка для северной ходьбы
+                case "Езда на велосипеде":
+                    return R.drawable.ic_cycling_man; // Иконка для езды на велосипеде
+                default:
+                    return R.drawable.ic_runnuig_man; // Иконка по умолчанию
             }
         }
     }

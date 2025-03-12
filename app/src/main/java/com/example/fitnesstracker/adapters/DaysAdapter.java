@@ -25,6 +25,13 @@ public class DaysAdapter extends RecyclerView.Adapter<DaysAdapter.DayViewHolder>
         this.selectedDays = new ArrayList<>();
     }
 
+    // Метод для установки начальных выбранных дней
+    public void setSelectedDays(List<String> selectedDays) {
+        this.selectedDays.clear();
+        this.selectedDays.addAll(selectedDays);
+        notifyDataSetChanged(); // Обновляем RecyclerView
+    }
+
     @NonNull
     @Override
     public DayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
