@@ -237,7 +237,7 @@ public class LoginActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
             loginButton.setEnabled(true); // Включаем кнопку
-            loginButton.setBackgroundColor(Color.MAGENTA);
+            loginButton.setBackgroundResource(R.drawable.rounded_button);
         });
     }
 

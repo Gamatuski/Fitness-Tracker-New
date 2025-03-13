@@ -14,7 +14,7 @@
         android:layout_above="@id/loginCard"
         android:layout_alignParentEnd="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginEnd="120dp"
+        android:layout_marginEnd="110dp"
         android:layout_marginBottom="32dp"
         android:elevation="4dp"
         android:text="Fitness Tracker"
@@ -95,7 +95,8 @@
                     android:text="Вход"
                     android:backgroundTint="@color/purpule"
                     android:textColor="@color/white"
-                    android:padding="12dp"/>
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_button"/>
 
                 <TextView
                     android:id="@+id/registerTextView"

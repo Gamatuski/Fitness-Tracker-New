@@ -1,26 +1,32 @@
 package com.example.fitnesstracker.fragments;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fitnesstracker.R;
+import com.example.fitnesstracker.activities.ActivityDetailsActivity;
 import com.example.fitnesstracker.activities.AddTrainingActivity;
 import com.example.fitnesstracker.adapters.SwipeToDeleteCallback;
 import com.example.fitnesstracker.api.FitnessApi;
@@ -33,7 +39,10 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -42,8 +51,7 @@ import retrofit2.Response;
 
 public class ProgressFragment extends Fragment {
 
-    private RecyclerView activitiesRecyclerView;
-    private ActivitiesAdapter activitiesAdapter;
+    private LinearLayout monthlyActivitiesContainer;
     private FloatingActionButton addTrainingButton;
     private Call<List<Activity>> call;
     private static final int ADD_TRAINING_REQUEST_CODE = 1;
@@ -53,32 +61,25 @@ public class ProgressFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_progress, container, false);
 
-        activitiesRecyclerView = view.findViewById(R.id.activitiesRecyclerView);
-        activitiesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
-        // Инициализация адаптера с пустым списком
-        activitiesAdapter = new ActivitiesAdapter(new ArrayList<>(),requireContext());
-        activitiesRecyclerView.setAdapter(activitiesAdapter); // Устанавл
-
+        monthlyActivitiesContainer = view.findViewById(R.id.monthlyActivitiesContainer);
         addTrainingButton = view.findViewById(R.id.addTrainingButton);
         addTrainingButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddTrainingActivity.class);
-            startActivityForResult(intent, ADD_TRAINING_REQUEST_CODE); // Use startActivityForResult
+            startActivityForResult(intent, ADD_TRAINING_REQUEST_CODE);
         });
-
-        // Иконка для удаления (если нужно)
-        Drawable deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete);
-
-        // Привязываем ItemTouchHelper
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(activitiesAdapter, deleteIcon));
-        itemTouchHelper.attachToRecyclerView(activitiesRecyclerView);
 
         // Загрузка данных
         loadActivities();
 
         return view;
     }
+
+    /*@Override
+    public void onResume() {
+        super.onResume();
+        loadActivities();
+    } */
+
 
     private void loadActivities() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("fitness_prefs", Context.MODE_PRIVATE);
@@ -94,8 +95,16 @@ public class ProgressFragment extends Fragment {
             @Override
             public void onResponse(Call<List<Activity>> call, Response<List<Activity>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Обновляем адаптер новыми данными
-                    activitiesAdapter.updateData(response.body());
+                    // Группируем активности по месяцам
+                    Map<String, List<Activity>> activitiesByMonth = groupActivitiesByMonth(response.body());
+
+                    // Очищаем контейнер перед добавлением новых блоков
+                    monthlyActivitiesContainer.removeAllViews();
+
+                    // Создаем блоки для каждого месяца
+                    for (Map.Entry<String, List<Activity>> entry : activitiesByMonth.entrySet()) {
+                        addMonthlyActivityBlock(entry.getKey(), entry.getValue());
+                    }
                 } else {
                     Toast.makeText(getContext(), "Ошибка при загрузке данных", Toast.LENGTH_SHORT).show();
                 }
@@ -103,18 +112,75 @@ public class ProgressFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Activity>> call, Throwable t) {
-                if (!call.isCanceled()) { // Проверяем, что запрос не был отменён
+                if (!call.isCanceled()) {
                     showError("Ошибка сети");
                 }
             }
-
-
         });
-
-
     }
+
+    // Метод для группировки активностей по месяцам
+    private Map<String, List<Activity>> groupActivitiesByMonth(List<Activity> activities) {
+        Map<String, List<Activity>> activitiesByMonth = new HashMap<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", new Locale("ru"));
+
+        for (Activity activity : activities) {
+            String monthYear = dateFormat.format(activity.getDate());
+            if (!activitiesByMonth.containsKey(monthYear)) {
+                activitiesByMonth.put(monthYear, new ArrayList<>());
+            }
+            activitiesByMonth.get(monthYear).add(activity);
+        }
+
+        return activitiesByMonth;
+    }
+
+    // Метод для добавления блока с активностями за месяц
+    private void addMonthlyActivityBlock(String monthYear, List<Activity> activities) {
+        View monthlyBlock = LayoutInflater.from(getContext()).inflate(R.layout.item_monthly_activity, monthlyActivitiesContainer, false);
+
+        // Устанавливаем заголовок месяца
+        TextView monthYearTextView = monthlyBlock.findViewById(R.id.monthYearTextView);
+        monthYearTextView.setText(monthYear);
+
+        // Рассчитываем общую статистику
+        double totalDuration = 0;
+        double totalDistance = 0;
+        int totalCalories = 0;
+
+        for (Activity activity : activities) {
+            totalDuration += activity.getDuration();
+            totalDistance += activity.getDistance();
+            totalCalories += activity.getCalories();
+        }
+
+        // Устанавливаем общую статистику
+        TextView totalDurationTextView = monthlyBlock.findViewById(R.id.totalDurationTextView);
+        TextView totalDistanceTextView = monthlyBlock.findViewById(R.id.totalDistanceTextView);
+        TextView totalCaloriesTextView = monthlyBlock.findViewById(R.id.totalCaloriesTextView);
+
+        totalDurationTextView.setText(String.format("%.2f мин", totalDuration));
+        totalDistanceTextView.setText(String.format("%.2f км", totalDistance));
+        totalCaloriesTextView.setText(totalCalories + " ккал");
+
+        // Настраиваем RecyclerView для активностей
+        RecyclerView activitiesRecyclerView = monthlyBlock.findViewById(R.id.activitiesRecyclerView);
+        activitiesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ActivitiesAdapter activitiesAdapter = new ActivitiesAdapter(activities, getContext());
+        activitiesRecyclerView.setAdapter(activitiesAdapter);
+
+        // Добавляем свайп для удаления
+        Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(activitiesAdapter, vibrator);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeToDeleteCallback);
+        itemTouchHelper.attachToRecyclerView(activitiesRecyclerView);
+
+        // Добавляем блок в контейнер
+        monthlyActivitiesContainer.addView(monthlyBlock);
+    }
+
     private void showError(String message) {
-        if (getContext() != null) { // Проверяем, что контекст не null
+        if (getContext() != null) {
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         }
     }
@@ -122,7 +188,6 @@ public class ProgressFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Отменяем все запросы к API
         if (call != null) {
             call.cancel();
         }
@@ -132,14 +197,10 @@ public class ProgressFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ADD_TRAINING_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                // Обновляем UI
-                loadActivities();
-            }
+        if (requestCode == ADD_TRAINING_REQUEST_CODE && resultCode == RESULT_OK) {
+            loadActivities();
         }
     }
-
 
 
     public static class ActivitiesAdapter extends RecyclerView.Adapter<ActivitiesAdapter.ViewHolder> {
@@ -233,6 +294,16 @@ public class ProgressFragment extends Fragment {
             String formattedDate = dateFormat.format(date);
 
             holder.dateTextView.setText(formattedDate);
+
+            // Обработка нажатия на элемент
+
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, ActivityDetailsActivity.class);
+                intent.putExtra("activity", activity);
+                intent.putExtra("isEditMode", true); // Добавляем флаг
+                ((FragmentActivity) context).startActivityForResult(intent, ADD_TRAINING_REQUEST_CODE); // Используем startActivityForResult
+            });
+
         }
 
         @Override

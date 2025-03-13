@@ -17,7 +17,7 @@ import java.util.List;
 public class SelectActionActivity extends AppCompatActivity {
 
     private ActionsAdapter adapter;
-    private List<String> actions = Arrays.asList("Бег", "Прогулка", "Северная ходьба", "Езда на велосипеде");
+    private List<String> actions = Arrays.asList("Бег", "Прогулка", "Скандинавская ходьба", "Езда на велосипеде");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

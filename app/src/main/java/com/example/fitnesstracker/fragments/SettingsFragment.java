@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import com.example.fitnesstracker.R;
+import com.example.fitnesstracker.activities.LoginActivity;
 
 public class SettingsFragment extends Fragment {
 
@@ -34,6 +35,12 @@ public class SettingsFragment extends Fragment {
             // Открываем новую активность для отчёта
             Intent intent = new Intent(getActivity(), EditGoalsActivity.class);
             startActivity(intent);
+        });
+
+        view.findViewById(R.id.LogOutLayout).setOnClickListener(v -> {
+            // Создаем и показываем диалог
+            LogoutDialogFragment dialog = new LogoutDialogFragment();
+            dialog.show(getParentFragmentManager(), "LogoutDialog");
         });
 
         return view;

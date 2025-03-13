@@ -233,7 +233,6 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("image/png");
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Посмотрите на мой прогресс в фитнесе!");
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(shareIntent, "Поделиться прогрессом"));
 

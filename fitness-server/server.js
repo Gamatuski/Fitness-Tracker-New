@@ -276,7 +276,6 @@ app.post('/users/:userId/activities', async (req, res) => {
         }
 
 
-
         const newActivity = {
             action,
             distance,
@@ -296,6 +295,59 @@ app.post('/users/:userId/activities', async (req, res) => {
     } catch (err) {
         console.error('Ошибка при добавлении активности:', err);
         res.status(500).json({ success: false, message: 'Ошибка сервера', error: err.message }); // Include error message
+    }
+});
+
+app.put('/users/:userId/activities/:activityId', async (req, res) => {
+    const { userId, activityId } = req.params;
+    const { action, distance, calories, steps, duration, date } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        }
+
+        // Находим активность по ID
+        const activityIndex = user.activities.findIndex(activity => activity._id.toString() === activityId);
+        if (activityIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Активность не найдена' });
+        }
+
+        // Парсим дату
+        let parsedDate;
+        try {
+            const dateParts = date.split('.');
+            parsedDate = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+            if (isNaN(parsedDate)) {
+                throw new Error("Invalid date format");
+            }
+        } catch (error) {
+            return res.status(400).json({ success: false, message: 'Неверный формат даты. Ожидается ДД.ММ.ГГГГ' });
+        }
+
+        // Обновляем данные активности
+        user.activities[activityIndex] = {
+            action,
+            distance,
+            calories,
+            steps,
+            duration,
+            date: parsedDate
+        };
+
+        // Сохраняем обновленного пользователя
+        await user.save();
+
+        // Возвращаем обновлённую активность
+        res.status(200).json({
+            success: true,
+            message: 'Активность обновлена',
+            activity: user.activities[activityIndex] // Возвращаем обновлённую активность
+        });
+    } catch (err) {
+        console.error('Ошибка при обновлении активности:', err);
+        res.status(500).json({ success: false, message: 'Ошибка сервера', error: err.message });
     }
 });
 

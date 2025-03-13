@@ -2,9 +2,10 @@ package com.example.fitnesstracker.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Activity {
+public class Activity implements Serializable {
     @SerializedName("_id")
     private String id;
     private String action;
@@ -13,6 +14,21 @@ public class Activity {
     private int steps;
     private double duration;
     private Date date;
+
+    public Activity() {
+
+    }
+
+    public Activity(String action, double distance, int calories, int steps, double duration, Date date){
+
+        this.action = action;
+        this.distance = distance;
+        this.calories = calories;
+        this.steps = steps;
+        this.duration = duration;
+        this.date = date;
+    }
+
 
     // Геттеры и сеттеры
 

@@ -66,6 +66,13 @@ public interface FitnessApi {
             @Body ActivityRequest activityRequest
     );
 
+    @PUT("users/{userId}/activities/{activityId}")
+    Call<ActivityResponse> updateActivity(
+            @Path("userId") String userId,
+            @Path("activityId") String activityId,
+            @Body ActivityRequest activityRequest
+    );
+
     @GET("users/{userId}/activities")
     Call<List<Activity>> getActivities(@Path("userId") String userId);
 

@@ -44,6 +44,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.fitnesstracker.R;
+import com.example.fitnesstracker.activities.CountdownActivity;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.ActivityData;
@@ -119,6 +120,8 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     private ViewGroup.LayoutParams originalMapParams; // Исходные параметры макета карты
     private boolean isMapExpanded = false; // Флаг, указывающий, развернута ли карта
     private ImageView closeButton; // Кнопка закрытия развернутой карты
+
+    public static final int RESULT_OK = -1;
 
 
 
@@ -227,8 +230,11 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                 stopTimer();
                 startButton.setText("Начать");
             } else {
-                startTimer();
-                startButton.setText("Остановить");
+                //startButton.setText("Отсановить");
+
+                // Запуск CountdownActivity
+                Intent intent = new Intent(getActivity(), CountdownActivity.class);
+                startActivityForResult(intent, 1); // Используем startActivityForResult
             }
         });
 
@@ -282,6 +288,18 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+     //Обработка результата из CountdownActivity
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Запуск таймера после завершения CountdownActivity
+            startTimer();
+            startButton.setText("Остановить");
+        }
+    }
+
 
     private Location previousLocation = null; // Предыдущее местоположение
 
@@ -293,7 +311,7 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     private List<ActivityData> activities = Arrays.asList(
             new ActivityData("Бег", 8),
             new ActivityData("Прогулка", 3.5),
-            new ActivityData("Северная ходьба", 7),
+            new ActivityData("Скандинавская ходьба ходьба", 7),
             new ActivityData("Езда на велосипеде", 6)
     );
 
@@ -435,14 +453,9 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
 
 
     private void startTimer() {
-        if (isBound && stepCounterService != null) {
-            isRunning = true;
-            timerViewModel.setRunning(true);
-            timerService.startTimer(seconds);
-            startButton.setText("Остановить");
-        } else {
-            Log.e("StartFragment", "StepCounterService is not bound yet");
-            // Можно добавить повторную попытку через некоторое время
+        if (!isBound || stepCounterService == null) {
+            Log.e("StartFragment", "StepCounterService is not bound or null");
+            bindStepCounterService(); // Попытка привязать сервис
             handler.postDelayed(() -> {
                 if (isBound && stepCounterService != null) {
                     isRunning = true;
@@ -451,9 +464,23 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                     startButton.setText("Остановить");
                 } else {
                     Log.e("StartFragment", "StepCounterService is still not bound");
+                    Toast.makeText(getContext(), "Ошибка: Сервис не доступен", Toast.LENGTH_SHORT).show();
                 }
             }, 1000); // Повторная попытка через 1 секунду
+        } else {
+            isRunning = true;
+            timerViewModel.setRunning(true);
+            timerService.startTimer(seconds);
+            startButton.setText("Остановить");
         }
+    }
+
+    private void bindStepCounterService() {
+        Intent stepIntent = new Intent(requireContext(), StepCounterService.class);
+        requireContext().bindService(stepIntent, stepServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // Запуск сервиса, если он еще не запущен
+        requireContext().startForegroundService(stepIntent);
     }
 
     private void stopTimer() {
@@ -598,7 +625,7 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         Log.d("SaveActivity", "caloriesBurned: " + caloriesBurned);
 
         // Получаем текущую дату в формате "yyyy-MM-dd"
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         String currentDate = dateFormat.format(new Date());
         Log.d("SaveActivity", "currentDate: " + currentDate);
 
