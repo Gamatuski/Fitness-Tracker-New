@@ -66,6 +66,14 @@
             android:screenOrientation="portrait" />
         <activity android:name=".activities.SelectActionActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".activities.WelcomeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.LocationPermossionActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.SensorPermissionActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.MessagesPermissionActivity"
+            android:screenOrientation="portrait"/>
 
         <activity android:name=".activities.LoginActivity"
             android:screenOrientation="portrait"

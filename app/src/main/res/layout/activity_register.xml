@@ -8,21 +8,6 @@
     android:fitsSystemWindows="true">
 
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/registerCard"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginEnd="110dp"
-        android:layout_marginBottom="32dp"
-
-        android:elevation="4dp"
-        android:text="Fitness Tracker"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/registerCard"
         android:layout_width="match_parent"
@@ -98,12 +83,13 @@
                     android:layout_marginBottom="16dp"/>
 
                 <!-- Кнопка регистрации -->
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/registerButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Зарегистрироваться"
                     android:background="@drawable/rounded_button"
+                    app:backgroundTint="@null"
                     android:textColor="@color/white"
                     android:padding="12dp"/>
 

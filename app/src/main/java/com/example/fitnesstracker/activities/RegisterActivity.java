@@ -38,7 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText emailEditText, passwordEditText, heightEditText, weightEditText;
     private Button registerButton;
     private CardView registerCard;
-    private TextView titleTextView, errorTextView;
+    private TextView  errorTextView;
     private ProgressBar progressBar;
 
 
@@ -54,14 +54,10 @@ public class RegisterActivity extends AppCompatActivity {
         weightEditText = findViewById(R.id.weightEditText);
         registerButton = findViewById(R.id.registerButton);
         registerCard = findViewById(R.id.registerCard);
-        titleTextView = findViewById(R.id.titleTextView);
         errorTextView = findViewById(R.id.errorTextView);
 
         progressBar = findViewById(R.id.progressBar);
 
-        // Стилизация заголовка
-        StyleTitleText styleTitleText = new StyleTitleText();
-        styleTitleText.styleTitleText(titleTextView);
 
         setupFocusListeners();
 
@@ -124,13 +120,13 @@ public class RegisterActivity extends AppCompatActivity {
                         runOnUiThread(() -> {
                             progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
                             registerButton.setEnabled(true); // Включаем кнопку
-                            registerButton.setBackgroundColor(Color.MAGENTA);
+                            registerButton.setBackgroundResource(R.drawable.rounded_button);
                         });
                         // Успешная регистрация
                         Toast.makeText(RegisterActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
                         Log.d("RegisterActivity", "Response Success: " + new Gson().toJson(registerResponse)); // Log full success response
-                        // Закрываем текущую активность и переходим к LoginActivity
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        // Закрываем текущую активность и переходим к LocationPermossionActivity
+                        Intent intent = new Intent(RegisterActivity.this, LocationPermossionActivity.class);
                         startActivity(intent);
                         finish(); // Закрываем RegisterActivity
                     } else {

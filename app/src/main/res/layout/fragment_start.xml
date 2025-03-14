@@ -103,12 +103,12 @@
     </LinearLayout>
 
     <!-- Кнопка "Начать" -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_button"
-        android:backgroundTint="@color/purpule"
+        app:backgroundTint="@null"
         android:padding="16dp"
         android:text="Начать"
         android:textColor="@android:color/white"

@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout passwordInputLayout, emailInputLayout;
     private TextInputEditText passwordEditText, emailEditText;
     private Button loginButton;
-    private TextView registerTextView, titleTextView, errorTextView;;
+    private TextView registerTextView,  errorTextView;;
     private CardView loginCard;
 
     private ProgressBar progressBar;
@@ -68,14 +68,11 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
         registerTextView = findViewById(R.id.registerTextView);
         loginCard = findViewById(R.id.loginCard);
-        titleTextView = findViewById(R.id.titleTextView);
         errorTextView = findViewById(R.id.errorTextView);
 
         progressBar = findViewById(R.id.progressBar);
 
-        // Стилизация заголовка
-        StyleTitleText styleTitleText = new StyleTitleText();
-        styleTitleText.styleTitleText(titleTextView);
+
 
         // Обработчик фокуса для полей ввода
         setupFocusListeners();
@@ -105,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         registerTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
             startActivity(intent);
         });
 
@@ -147,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                         runOnUiThread(() -> {
                             progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
                             loginButton.setEnabled(true); // Включаем кнопку
-                            loginButton.setBackgroundColor(Color.MAGENTA);
+                            loginButton.setBackgroundResource(R.drawable.rounded_button);
                         });
 
                         // Успешный вход

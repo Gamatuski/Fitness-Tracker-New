@@ -11,7 +11,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/ic_runnuig_man"
-        android:background="@drawable/circle_icon_background"
+        android:background="@drawable/circle_button_background"
         android:scaleType="centerInside"
         android:padding="3dp"
         android:layout_alignParentStart="true"
@@ -49,8 +49,8 @@
                 android:layout_weight="1"
                 android:text="30 мин"
                 android:textColor="@color/gray"
-                android:textSize="14sp"
-                android:gravity="center"
+                android:textSize="12sp"
+                android:gravity="left"
                 android:layout_marginEnd="8dp"/>
 
             <TextView
@@ -60,8 +60,8 @@
                 android:layout_weight="1"
             android:text="5 км"
             android:textColor="@color/gray"
-            android:textSize="14sp"
-            android:gravity="center"
+            android:textSize="12sp"
+            android:gravity="left"
             android:layout_marginEnd="8dp"/>
 
             <TextView
@@ -71,8 +71,8 @@
                 android:layout_weight="1"
             android:text="300 ккал"
             android:textColor="@color/gray"
-            android:textSize="14sp"
-            android:gravity="center"
+            android:textSize="12sp"
+            android:gravity="left"
             android:layout_marginEnd="8dp"/>
 
             <TextView
@@ -82,8 +82,8 @@
                 android:layout_weight="1"
             android:text="01.01.2023"
             android:textColor="@color/gray"
-            android:textSize="14sp"
-            android:gravity="center"
+            android:textSize="12sp"
+            android:gravity="left"
             android:layout_marginEnd="8dp"/>
         </LinearLayout>
 

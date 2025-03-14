@@ -64,15 +64,23 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/decreaseStepsButton"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_gravity="center"
                     android:background="@drawable/circle_button_background"
-                    android:text="-"
+                    app:backgroundTint="@null"
                     android:textColor="@color/white"
-                    android:textSize="24sp" />
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_minus"
+                    app:iconSize="22dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"/>
             </FrameLayout>
 
             <FrameLayout
@@ -97,15 +105,23 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/increaseStepsButton"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_gravity="center"
                     android:background="@drawable/circle_button_background"
-                    android:text="+"
+                    app:backgroundTint="@null"
                     android:textColor="@color/white"
-                    android:textSize="18sp" />
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_plus"
+                    app:iconSize="22dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp" />
             </FrameLayout>
         </LinearLayout>
 
@@ -130,7 +146,8 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/steps_ic_purple" /> <!-- Замените на вашу иконку -->
+                android:src="@drawable/steps_ic_purple"
+                app:tint="@color/purpule"/> <!-- Замените на вашу иконку -->
         </LinearLayout>
 
         <LinearLayout
@@ -146,15 +163,23 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/decreaseDistanceButton"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_gravity="center"
                     android:background="@drawable/circle_button_background"
-                    android:text="-"
+                    app:backgroundTint="@null"
                     android:textColor="@color/white"
-                    android:textSize="24sp" />
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_minus"
+                    app:iconSize="22dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp" />
             </FrameLayout>
 
             <FrameLayout
@@ -179,15 +204,23 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/increaseDistanceButton"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_gravity="center"
                     android:background="@drawable/circle_button_background"
-                    android:text="+"
+                    app:backgroundTint="@null"
                     android:textColor="@color/white"
-                    android:textSize="18sp" />
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_plus"
+                    app:iconSize="22dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp" />
             </FrameLayout>
         </LinearLayout>
 
@@ -217,7 +250,7 @@
     </LinearLayout>
 
     <!-- Кнопка "Готово" -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/doneButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -225,6 +258,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_button"
+        app:backgroundTint="@null"
         android:text="Готово"
         android:textColor="@color/white"
         android:textSize="18sp"
