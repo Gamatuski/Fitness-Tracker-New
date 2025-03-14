@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,6 +40,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private ConstraintLayout preferredDaysLayout;
 
     private static final int REQUEST_CODE_PREFERRED_DAYS = 1;
+
+    private static final List<String> DAYS_OF_WEEK = Arrays.asList(
+            "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,17 +118,28 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             // Получаем выбранные дни из Intent
             List<String> selectedDays = data.getStringArrayListExtra("selectedDays");
 
-            // Обновляем поле preferredDays
-            TextView preferredDaysTextView = findViewById(R.id.preferredDays);
-            if (selectedDays != null && !selectedDays.isEmpty()) {
-                // Преобразуем список в строку с разделителем ", "
-                String selectedDaysText = TextUtils.join(", ", selectedDays);
-                preferredDaysTextView.setText(selectedDaysText);
-            } else {
-                // Если ничего не выбрано, можно установить текст по умолчанию
-                preferredDaysTextView.setText("Дни не выбраны");
-            }
+            // Сортируем выбранные дни в порядке дней недели
+            String selectedDaysText = sortDays(selectedDays);
+            preferredDays.setText(selectedDaysText);
         }
+    }
+
+
+    private String sortDays(List<String> days) {
+        if (days == null || days.isEmpty()) {
+            return "Дни не выбраны";
+        }
+
+
+        // Сортируем дни в порядке дней недели
+        days.sort((day1, day2) -> {
+            int index1 = DAYS_OF_WEEK.indexOf(day1);
+            int index2 = DAYS_OF_WEEK.indexOf(day2);
+            return Integer.compare(index1, index2);
+        });
+
+        // Возвращаем отсортированную строку
+        return TextUtils.join(", ", days);
     }
 
     private void scheduleNotifications() {
