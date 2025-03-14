@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,22 +9,20 @@
 
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/white"
-    >
-
-    <!-- Внутренний макет -->
+    app:cardBackgroundColor="@color/white">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        >
 
         <!-- Заголовок -->
         <TextView
             android:id="@+id/dialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Выход из приложения"
+            android:text="Удаить активность"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center"
@@ -34,7 +33,7 @@
             android:id="@+id/dialogMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Вы уверены, что хотите выйти?"
+            android:text="Вы уверены, что хотите удалить активность?"
             android:textSize="16sp"
             android:gravity="center"
             android:paddingBottom="16dp"/>

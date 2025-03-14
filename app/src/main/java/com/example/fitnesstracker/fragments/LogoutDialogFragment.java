@@ -3,6 +3,8 @@ package com.example.fitnesstracker.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,14 @@ public class LogoutDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
 
+        // Создаем диалог
+        AlertDialog dialog = builder.create();
+
+        // Устанавливаем прозрачный фон для диалога
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
         // Настройка кнопки "Да"
         btnYes.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), LoginActivity.class);
@@ -42,7 +52,7 @@ public class LogoutDialogFragment extends DialogFragment {
         // Настройка кнопки "Нет"
         btnNo.setOnClickListener(v -> dismiss()); // Закрываем диалог
 
-        // Создаем и возвращаем диалог
-        return builder.create();
+        // Возвращаем диалог
+        return dialog;
     }
 }

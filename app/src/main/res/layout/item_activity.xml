@@ -39,43 +39,52 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="4"> <!-- Указываем общий вес (количество элементов) -->
 
             <TextView
                 android:id="@+id/durationTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="30 мин"
                 android:textColor="@color/gray"
                 android:textSize="14sp"
-                android:layout_marginEnd="16dp"/>
+                android:gravity="center"
+                android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/distanceTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="5 км"
-                android:textColor="@color/gray"
-                android:textSize="14sp" />
+                android:layout_weight="1"
+            android:text="5 км"
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/caloriesTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="300 ккал"
-                android:textColor="@color/gray"
-                android:textSize="14sp" />
+                android:layout_weight="1"
+            android:text="300 ккал"
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/dateTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginStart="16dp"
-                android:text="01.01.2023"
-                android:textColor="@color/gray"
-                android:textSize="14sp" />
+                android:layout_weight="1"
+            android:text="01.01.2023"
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginEnd="8dp"/>
         </LinearLayout>
 
         <!-- Серая линия для разделения элементов -->

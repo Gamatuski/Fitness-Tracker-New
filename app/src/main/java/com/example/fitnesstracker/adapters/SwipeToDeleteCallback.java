@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fitnesstracker.fragments.DeleteActivityDialogFragment;
 import com.example.fitnesstracker.fragments.ProgressFragment;
 
 public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
@@ -38,19 +39,30 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
         int position = viewHolder.getAdapterPosition();
 
         if (direction == ItemTouchHelper.LEFT) {
-            // Показываем диалог подтверждения
-            new AlertDialog.Builder(viewHolder.itemView.getContext())
-                    .setTitle("Удаление")
-                    .setMessage("Вы уверены, что хотите удалить этот элемент?")
-                    .setPositiveButton("Да", (dialog, which) -> adapter.deleteItem(position))
-                    .setNegativeButton("Нет", (dialog, which) -> adapter.notifyItemChanged(position)) // Отмена удаления
-                    .show();
+            // Создаем диалог подтверждения удаления
+            DeleteActivityDialogFragment dialog = DeleteActivityDialogFragment.newInstance(
+                    position, // Позиция элемента
+                    new DeleteActivityDialogFragment.DeleteListener() {
+                        @Override
+                        public void onDeleteConfirmed(int position) {
+                            adapter.deleteItem(position); // Удаляем элемент
+                        }
+                    },
+                    new DeleteActivityDialogFragment.CancelListener() {
+                        @Override
+                        public void onDeleteCanceled(int position) {
+                            adapter.notifyItemChanged(position); // Возвращаем элемент на место
+                        }
+                    }
+            );
+
+            // Показываем диалог
+            dialog.show(adapter.getFragmentManager(), "DeleteActivityDialog");
         } else if (direction == ItemTouchHelper.RIGHT) {
             // Возвращаем элемент на место
             adapter.notifyItemChanged(position);
         }
     }
-
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);

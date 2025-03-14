@@ -251,6 +251,13 @@ public class ProgressFragment extends Fragment {
             });
         }
 
+        public androidx.fragment.app.FragmentManager getFragmentManager() {
+            if (context instanceof FragmentActivity) {
+                return ((FragmentActivity) context).getSupportFragmentManager();
+            }
+            throw new IllegalStateException("Context is not a FragmentActivity");
+        }
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_activity, parent, false);
