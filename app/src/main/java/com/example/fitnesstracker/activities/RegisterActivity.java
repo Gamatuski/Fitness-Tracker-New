@@ -161,7 +161,7 @@ public class RegisterActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     progressBar.setVisibility(View.GONE); // Скрываем ProgressBar
                     registerButton.setEnabled(true); // Включаем кнопку
-                    registerButton.setBackgroundColor(Color.MAGENTA);
+                    registerButton.setBackgroundResource(R.drawable.rounded_button);
                 });
                 // Ошибка сети
                 Log.e("RegisterActivity", "Ошибка сети: " + t.getMessage());

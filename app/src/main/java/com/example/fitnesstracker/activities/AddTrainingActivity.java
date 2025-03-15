@@ -19,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fitnesstracker.R;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
+import com.example.fitnesstracker.fragments.DatePickerBottomSheet;
+import com.example.fitnesstracker.fragments.TimePickerBottomSheet;
 import com.example.fitnesstracker.models.Activity;
 import com.example.fitnesstracker.models.ActivityRequest;
 import com.example.fitnesstracker.models.ActivityResponse;
@@ -95,84 +97,19 @@ public class AddTrainingActivity extends AppCompatActivity {
                 startDateEditText.setText(formattedDate);
             }
         }
+        // Получаем текущую дату
+        LocalDate date = LocalDate.now();
+
+        // Форматируем дату в строку
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+        // Устанавливаем текст в поле редактирования
+        startDateEditText.setText(formattedDate);
 
 
-        // Добавление TextWatcher для автоматического форматирования даты
-        startDateEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        // Обработка нажатия на currentDate
+        startDateEditText.setOnClickListener(v -> showDatePickerBottomSheet());
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-
-                if (isFormatting) return;
-
-                String input = s.toString();
-                StringBuilder formatted = new StringBuilder();
-
-                // Удаляем все символы, кроме цифр
-                String digitsOnly = input.replaceAll("[^\\d]", "");
-
-                for (int i = 0; i < digitsOnly.length(); i++) {
-                    if (i == 2 || i == 4) {
-                        formatted.append("."); // Добавляем точку после дня и месяца
-                    }
-                    formatted.append(digitsOnly.charAt(i));
-                }
-
-                // Обрезаем лишние символы, если длина больше 10 (ДД.ММ.ГГГГ)
-                if (formatted.length() > 10) {
-                    formatted.setLength(10);
-                }
-
-                isFormatting = true;
-                startDateEditText.setText(formatted.toString());
-                startDateEditText.setSelection(formatted.length()); // Устанавливаем курсор в конец
-                isFormatting = false;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String date = s.toString();
-                if (!isValidDate(date)) {
-                    startDateEditText.setError("Некорректная дата");
-                } else {
-                    startDateEditText.setError(null);
-                }
-            }
-
-            private boolean isValidDate(String date) {
-                if (date.length() != 10) return false; // Проверяем длину строки (ДД.ММ.ГГГГ)
-
-                String[] parts = date.split("\\.");
-                if (parts.length != 3) return false; // Должно быть 3 части: день, месяц, год
-
-                try {
-                    int day = Integer.parseInt(parts[0]);
-                    int month = Integer.parseInt(parts[1]);
-                    int year = Integer.parseInt(parts[2]);
-
-                    // Проверяем корректность дня и месяца
-                    if (month < 1 || month > 12) return false;
-                    if (day < 1 || day > 31) return false;
-
-                    // Дополнительные проверки для месяцев с 30 днями и февраля
-                    if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) return false;
-                    if (month == 2) {
-                        // Проверка для февраля (високосный год)
-                        boolean isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-                        if (day > 29 || (!isLeapYear && day > 28)) return false;
-                    }
-
-                    return true;
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            }
-        });
 
 
         findViewById(R.id.actionLayout).setOnClickListener(v -> {
@@ -208,6 +145,22 @@ public class AddTrainingActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void showDatePickerBottomSheet() {
+        // Создание экземпляра DatePickerBottomSheet
+        DatePickerBottomSheet datePickerBottomSheet = new DatePickerBottomSheet();
+
+        // Установка слушателя для получения выбранной даты
+        datePickerBottomSheet.setOnDateSelectedListener(selectedDate -> {
+            // Обновляем текст в currentDate
+            startDateEditText.setText(selectedDate);
+        });
+
+        // Показываем BottomSheetDialog
+        datePickerBottomSheet.show(getSupportFragmentManager(), "DatePickerBottomSheet");
+    }
+
+
 
     private void saveTrainingData() throws ParseException {
         boolean isEditMode = getIntent().getBooleanExtra("isEditMode", false);

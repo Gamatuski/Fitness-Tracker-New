@@ -2,7 +2,7 @@
     <string-array name="activities_array">
         <item>Бег</item>
         <item>Прогулка</item>
-        <item>Северная ходьба</item>
+        <item>Скандинавская ходьба</item>
         <item>Езда на велосипеде</item>
     </string-array>
 </resources>

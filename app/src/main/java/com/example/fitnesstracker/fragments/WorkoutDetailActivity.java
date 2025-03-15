@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.example.fitnesstracker.R;
 import com.example.fitnesstracker.models.Workout;
 import com.example.fitnesstracker.receivers.WorkoutNotificationReceiver;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import java.util.Locale;
 public class WorkoutDetailActivity extends AppCompatActivity {
 
     private Workout workout;
-    private TextView startDate, currentDate, notificationTime, preferredDays, action, difficultyText;
+    private TextView  currentDate, notificationTime, preferredDays, action, difficultyText;
     private ImageView workoutImage, arrowIcon;
     private Button doneButton;
 
@@ -54,7 +55,6 @@ public class WorkoutDetailActivity extends AppCompatActivity {
         workout = (Workout) getIntent().getSerializableExtra("workout");
 
         // Инициализация UI
-        startDate = findViewById(R.id.startDate);
         currentDate = findViewById(R.id.currentDate);
         notificationTime = findViewById(R.id.notificationTime);
         preferredDays = findViewById(R.id.preferredDays);
@@ -80,6 +80,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CODE_PREFERRED_DAYS);
         });
 
+
         // Устанавливаем данные Workout
         if (workout != null) {
             if (workout.getImage() != null && workout.getImage().getImageUrl() != null) {
@@ -93,11 +94,10 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             // Устанавливаем даты
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
             String currentDateStr = dateFormat.format(Calendar.getInstance().getTime());
-            startDate.setText(currentDateStr);
             currentDate.setText(currentDateStr);
 
-            // Устанавливаем время уведомления по умолчанию
-            notificationTime.setText("18:00");
+
+            notificationTime.setOnClickListener(v -> showTimePickerBottomSheet());
 
             // Устанавливаем предпочтительные дни
             preferredDays.setText("Вторник, Четверг, Суббота");
@@ -105,9 +105,40 @@ public class WorkoutDetailActivity extends AppCompatActivity {
             action.setText(workout.getAction());
             difficultyText.setText(workout.getDifficulty());
 
+            // Обработка нажатия на currentDate
+            currentDate.setOnClickListener(v -> showDatePickerBottomSheet());
+
             // Обработка нажатия на кнопку "Готово"
             doneButton.setOnClickListener(v -> scheduleNotifications());
         }
+    }
+
+    private void showDatePickerBottomSheet() {
+        // Создание экземпляра DatePickerBottomSheet
+        DatePickerBottomSheet datePickerBottomSheet = new DatePickerBottomSheet();
+
+        // Установка слушателя для получения выбранной даты
+        datePickerBottomSheet.setOnDateSelectedListener(selectedDate -> {
+            // Обновляем текст в currentDate
+            currentDate.setText(selectedDate);
+        });
+
+        // Показываем BottomSheetDialog
+        datePickerBottomSheet.show(getSupportFragmentManager(), "DatePickerBottomSheet");
+    }
+
+    private void showTimePickerBottomSheet() {
+        // Создание экземпляра timePickerBottomSheet
+        TimePickerBottomSheet timePickerBottomSheet = new TimePickerBottomSheet();
+
+        // Установка слушателя для получения выбранного времени
+        timePickerBottomSheet.setOnTimeSelectedListener(selectedTime -> {
+            // Обновляем текст в currentDate
+            notificationTime.setText(selectedTime);
+        });
+
+        // Показываем BottomSheetDialog
+        timePickerBottomSheet.show(getSupportFragmentManager(), "TimePickerBottomSheet");
     }
 
     @Override
@@ -144,8 +175,8 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     private void scheduleNotifications() {
         // Получаем выбранные дни и время уведомления
-        String[] days = {"Вторник", "Четверг", "Суббота"};
-        String time = "18:00";
+        String[] days = preferredDays.getText().toString().split(",");
+        String time = notificationTime.getText().toString() ;
 
         // Создаем уведомления на выбранные дни
         for (String day : days) {
@@ -158,7 +189,7 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
     private void scheduleNotification(String day, String time) {
         // Преобразуем день недели в Calendar.DAY_OF_WEEK
-        int dayOfWeek = getDayOfWeek(day);
+        int dayOfWeek = getDayOfWeek(day.trim()); // Убедимся, что лишние пробелы удалены
 
         // Преобразуем время в часы и минуты
         String[] timeParts = time.split(":");
@@ -174,7 +205,8 @@ public class WorkoutDetailActivity extends AppCompatActivity {
 
         // Создаем Intent для BroadcastReceiver
         Intent intent = new Intent(this, WorkoutNotificationReceiver.class);
-        intent.putExtra("workout", workout);
+        intent.putExtra("workout", workout); // Передаем объект workout
+        intent.putExtra("workoutName", workout.getAction()); // Передаем название тренировки
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, dayOfWeek, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Устанавливаем уведомление через AlarmManager

@@ -170,6 +170,9 @@ public class StepCounterService extends Service implements SensorEventListener {
 
                 updateStepsToDatabase(currentStepCount, dayIndex);
                 updateDistance(currentStepCount);
+
+                // Обновляем уведомление с текущим количеством шагов
+                updateNotification("Шагов: " + currentStepCount);
             }
         }
     }

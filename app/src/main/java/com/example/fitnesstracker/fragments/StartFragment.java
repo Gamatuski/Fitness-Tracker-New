@@ -311,7 +311,7 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     private List<ActivityData> activities = Arrays.asList(
             new ActivityData("Бег", 8),
             new ActivityData("Прогулка", 3.5),
-            new ActivityData("Скандинавская ходьба ходьба", 7),
+            new ActivityData("Скандинавская ходьба", 7),
             new ActivityData("Езда на велосипеде", 6)
     );
 
@@ -568,11 +568,7 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
                     requireContext().bindService(stepIntent, stepServiceConnection, Context.BIND_AUTO_CREATE);
 
                     // Start the service
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        requireContext().startForegroundService(stepIntent);
-                    } else {
-                        requireContext().startService(stepIntent);
-                    }
+                    requireContext().startForegroundService(stepIntent);
 
                 } else {
                     Log.e("LoadUserWeight", "Error loading user data: " + response.message());
@@ -730,10 +726,9 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void requestActivityRecognitionPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10 и выше
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, ACTIVITY_RECOGNITION_REQUEST_CODE);
-            }
+        // Android 10 и выше
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, ACTIVITY_RECOGNITION_REQUEST_CODE);
         }
     }
 

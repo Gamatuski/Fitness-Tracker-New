@@ -87,6 +87,8 @@ dependencies {
     implementation libs.glide
     annotationProcessor libs.compiler
     implementation libs.material.v1110
+    implementation libs.materialdatetimepicker
+    implementation libs.switch.button
 
 
 }

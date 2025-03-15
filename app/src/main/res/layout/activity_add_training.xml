@@ -130,7 +130,7 @@
 
                 <EditText
                     android:id="@+id/distanceEditText"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
@@ -166,7 +166,7 @@
 
                 <EditText
                     android:id="@+id/caloriesEditText"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
@@ -202,7 +202,7 @@
 
                 <EditText
                     android:id="@+id/stepsEditText"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
@@ -237,7 +237,7 @@
 
                 <EditText
                     android:id="@+id/durationEditText"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
@@ -270,7 +270,7 @@
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/startDateEditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -278,7 +278,7 @@
                     android:background="@null"
                     android:textAlignment="textEnd"
                     android:textColor="@color/purpule"
-                    android:hint="ДД.ММ.ГГГГ"
+
                     android:inputType="datetime"
                     android:textColorHint="@color/purpule"
                     android:textSize="16sp" />

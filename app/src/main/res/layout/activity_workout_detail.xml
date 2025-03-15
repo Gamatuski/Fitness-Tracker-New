@@ -51,13 +51,13 @@
                         android:text="Дата начала:"
                         android:textSize="14sp" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/currentDate"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:hint="10.03.2025"
+
                         android:textSize="14sp"
                         android:background="@null" />
                 </LinearLayout>
@@ -82,13 +82,13 @@
                         android:layout_height="wrap_content"
                         android:text="Время уведомления:"
                         android:textSize="14sp" />
-                    <EditText
+                    <TextView
                         android:id="@+id/notificationTime"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:hint="18:00"
+                        android:text="12:00"
                         android:textSize="14sp"
                         android:background="@null" />
                 </LinearLayout>
