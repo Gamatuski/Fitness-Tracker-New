@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat;
 import com.example.fitnesstracker.R;
 
 public class SensorPermissionActivity extends AppCompatActivity {
-    private static final int SENSOR_PERMISSION_REQUEST_CODE = 1002;
+    private static final int ACTIVITY_RECOGNITION_REQUEST_CODE = 1002;
     Button sensorPermissionButton;
 
     @Override
@@ -25,17 +25,17 @@ public class SensorPermissionActivity extends AppCompatActivity {
         sensorPermissionButton = findViewById(R.id.SensorPermissionButton);
 
         sensorPermissionButton.setOnClickListener(v -> {
-            requestSensorPermission();
+            requestActivityRecognitionPermission();
         });
     }
 
-    private void requestSensorPermission() {
+    private void requestActivityRecognitionPermission() {
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.BODY_SENSORS) != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.BODY_SENSORS},
-                    SENSOR_PERMISSION_REQUEST_CODE);
-        }else {
+                    new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
+                    ACTIVITY_RECOGNITION_REQUEST_CODE);
+        } else {
             Intent intent = new Intent(SensorPermissionActivity.this, MessagesPermissionActivity.class);
             startActivity(intent);
 
@@ -46,13 +46,13 @@ public class SensorPermissionActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == SENSOR_PERMISSION_REQUEST_CODE) {
+        if (requestCode == ACTIVITY_RECOGNITION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent intent = new Intent(SensorPermissionActivity.this, MessagesPermissionActivity.class);
                 startActivity(intent);
 
                 finish();
-            }else {
+            } else {
                 Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
                 startActivity(intent);

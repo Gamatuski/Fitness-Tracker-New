@@ -43,7 +43,7 @@ public class TimePickerBottomSheet extends BottomSheetDialogFragment {
         // Установка минимальных и максимальных значений для NumberPicker
         numPickerHour.setMinValue(0);
         numPickerHour.setMaxValue(23);
-        numPickerHour.setValue(12); // Начальное значение часов
+        numPickerHour.setValue(18); // Начальное значение часов
 
         numPickerMinute.setMinValue(0);
         numPickerMinute.setMaxValue(59);

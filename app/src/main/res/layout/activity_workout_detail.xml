@@ -88,7 +88,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:text="12:00"
+                        android:text="18:00"
                         android:textSize="14sp"
                         android:background="@null" />
                 </LinearLayout>
