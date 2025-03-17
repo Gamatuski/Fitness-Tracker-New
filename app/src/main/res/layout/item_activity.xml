@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@color/cardview_background"
     >
 
     <!-- ImageView с круглым фоном и изображением внутри -->
@@ -32,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Бег"
-            android:textColor="@color/black"
+            android:textColor="@color/text_color"
             android:textSize="18sp" />
 
         <LinearLayout
@@ -46,21 +47,21 @@
                 android:id="@+id/durationTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0.8"
                 android:text="30 мин"
                 android:textColor="@color/gray"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:gravity="left"
                 android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/distanceTextView"
-                android:layout_width="0dp"
+                android:layout_width="0.5dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
             android:text="5 км"
             android:textColor="@color/gray"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:gravity="left"
             android:layout_marginEnd="8dp"/>
 
@@ -68,10 +69,10 @@
                 android:id="@+id/caloriesTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0.8"
             android:text="300 ккал"
             android:textColor="@color/gray"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:gravity="left"
             android:layout_marginEnd="8dp"/>
 
@@ -79,10 +80,10 @@
                 android:id="@+id/dateTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="1.5"
             android:text="01.01.2023"
             android:textColor="@color/gray"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:gravity="left"
             android:layout_marginEnd="8dp"/>
         </LinearLayout>

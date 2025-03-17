@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/smoky_white"
+    android:background="@color/background"
     android:fitsSystemWindows="true">
 
     <!-- Карта -->
@@ -70,7 +70,7 @@
                 android:src="@drawable/ic_minus"
                 android:background="@drawable/circle_black"
                 android:contentDescription="@string/minus_button"
-                app:tint="@android:color/white" />
+                />
 
             <!-- Таймер -->
             <TextView
@@ -89,7 +89,7 @@
                 android:src="@drawable/ic_plus"
                 android:background="@drawable/circle_black"
                 android:contentDescription="@string/plus_button"
-                app:tint="@android:color/white" />
+                />
         </LinearLayout>
 
         <!-- Выпадающий список -->
@@ -98,7 +98,13 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/edittext_background" />
+            android:background="@null"
+            android:popupBackground="@drawable/cardview_background"
+            android:spinnerMode="dropdown"
+            android:textSize="26sp"
+            android:drawableEnd="@drawable/ic_arrow_down"
+            android:textAlignment="center"
+            android:drawablePadding="8dp" />
 
     </LinearLayout>
 

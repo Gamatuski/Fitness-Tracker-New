@@ -5,26 +5,29 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/cardview_background">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <!-- Картинка -->
         <ImageView
             android:id="@+id/workoutImage"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="150dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/workout_placeholder" />
+            android:src="@drawable/workout_placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/workoutImage">
 
             <!-- Название тренировки -->
             <TextView
@@ -33,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Workout Name"
+                android:textColor="@color/text_color"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -57,6 +61,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Умеренный"
+                    android:textColor="@color/text_color"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -68,7 +73,8 @@
                 android:layout_gravity="end"
                 android:layout_marginTop="8dp"
                 android:text="3 тренировки/неделя"
+                android:textColor="@color/text_color"
                 android:textSize="12sp" />
         </LinearLayout>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

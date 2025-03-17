@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/smoky_white"
+    android:background="@color/background"
     android:fitsSystemWindows="true">
 
     <!-- Контейнер для фрагментов -->
@@ -16,14 +16,14 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
 
-        android:background="@color/light_gray" />
+        android:background="@color/background" />
 
     <!-- BottomNavigationView -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/cardview_background"
 
         app:menu="@menu/bottom_navigation_menu" />
 </LinearLayout>

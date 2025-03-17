@@ -40,8 +40,8 @@ import retrofit2.Response;
 
 public class AddTrainingActivity extends AppCompatActivity {
 
-    private TextView cancelTextView, saveTextView, actionTextView;
-    private EditText  distanceEditText, caloriesEditText, stepsEditText, durationEditText, startDateEditText;
+    private TextView cancelTextView, saveTextView, actionTextView, startDateEditText;
+    private EditText  distanceEditText, caloriesEditText, stepsEditText, durationEditText;
     private boolean isFormatting;
     private static final int REQUEST_ACTIVITY_CODE = 1;
 

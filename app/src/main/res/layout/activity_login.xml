@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@color/smoky_white"
+    android:background="@color/background"
     android:fitsSystemWindows="true">
 
     <androidx.cardview.widget.CardView
@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        app:cardBackgroundColor="@color/cardview_background"
         app:cardElevation="4dp"
         app:cardCornerRadius="12dp"
         android:layout_margin="16dp">
@@ -33,7 +34,8 @@
                     android:layout_marginBottom="16dp"
                     app:endIconMode="custom"
                     app:endIconDrawable="@drawable/ic_email"
-                    app:endIconTint="@color/gray">
+                    app:endIconTint="@color/secondary_color"
+                    android:textColorHint="@color/secondary_color">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/emailEditText"
@@ -42,6 +44,7 @@
                         android:hint="Email"
                         android:inputType="textEmailAddress"
                         android:padding="12dp"
+                        android:textColor="@color/text_color"
                         android:background="@drawable/edittext_background"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -52,6 +55,8 @@
                     android:layout_height="wrap_content"
                     app:passwordToggleEnabled="true"
                     app:passwordToggleDrawable="@drawable/password_toggle_drawable"
+                    app:passwordToggleTint="@color/secondary_color"
+                    android:textColorHint="@color/secondary_color"
                     android:layout_marginBottom="16dp">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -61,6 +66,7 @@
                         android:hint="Password"
                         android:inputType="textPassword"
                         android:padding="12dp"
+                        android:textColor="@color/text_color"
                         android:background="@drawable/edittext_background"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -69,7 +75,7 @@
                     android:id="@+id/errorTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/red"
+                    android:textColor="@color/error_color"
                     android:textSize="14sp"
                     android:visibility="gone"
                     android:layout_marginBottom="16dp"/>
@@ -89,9 +95,8 @@
                     android:id="@+id/registerTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:text="Регистрация"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/secondary_color"
                     android:textSize="16sp"
                     android:clickable="true"
                     android:focusable="true"

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/cardview_background">
 
     <TextView
         android:id="@+id/textView2"
@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:text="Добро Пожаловать!"
         android:textSize="26sp"
+        android:textColor="@color/text_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,6 +39,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:textColor="@color/text_color"
         android:text="Давайте выведем вашу физическую форму на новый уровень!"
         android:textAlignment="center"
         android:textSize="16sp"
@@ -52,6 +54,7 @@
         android:layout_marginTop="210dp"
         android:background="@drawable/rounded_button"
         android:text="Продолжить"
+        android:textColor="@color/white"
         android:textAlignment="center"
         android:paddingStart="110dp"
         android:paddingEnd="110dp"

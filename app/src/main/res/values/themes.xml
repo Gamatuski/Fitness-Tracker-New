@@ -1,8 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.FitnessTracker" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorPrimaryDark">@color/primary_color</item>
+        <item name="colorAccent">@color/primary_color</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textColorPrimary">@color/text_color</item>
+        <item name="android:textColorSecondary">@color/secondary_color</item>
+        <item name="cardViewStyle">@style/CardViewStyle</item>
+        <item name="android:statusBarColor">@color/primary_color</item>
+        <item name="android:navigationBarColor">@color/background</item>
     </style>
 
     <style name="Theme.FitnessTracker" parent="Base.Theme.FitnessTracker" />

@@ -162,6 +162,8 @@ public class WeeklyReportActivity extends AppCompatActivity {
         xAxis.setGranularity(1f);
         xAxis.setLabelCount(7);
         xAxis.setValueFormatter(new IndexAxisValueFormatter(new String[]{"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"}));
+        xAxis.setTextColor(R.color.secondary_color);
+
 
         // Настройка оси Y
         YAxis yAxis = barChart.getAxisLeft();

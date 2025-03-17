@@ -2,7 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -12,6 +13,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/cardview_background"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,6 +51,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Дата начала:"
+                        android:textColor="@color/text_color"
                         android:textSize="14sp" />
 
                     <TextView
@@ -57,7 +60,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-
+                        android:textColor="@color/text_color"
                         android:textSize="14sp"
                         android:background="@null" />
                 </LinearLayout>
@@ -81,6 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Время уведомления:"
+                        android:textColor="@color/text_color"
                         android:textSize="14sp" />
                     <TextView
                         android:id="@+id/notificationTime"
@@ -89,6 +93,7 @@
                         android:layout_weight="1"
                         android:gravity="end"
                         android:text="18:00"
+                        android:textColor="@color/text_color"
                         android:textSize="14sp"
                         android:background="@null" />
                 </LinearLayout>
@@ -114,6 +119,7 @@
                         android:layout_height="wrap_content"
                         android:text="Предпочтительные дни тренировки"
                         android:textSize="14sp"
+                        android:textColor="@color/text_color"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -122,7 +128,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Вторник, Четверг, Суббота"
-                        android:textColor="@color/gray"
+                        android:textColor="@color/secondary_color"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/preferredDaysText"
@@ -133,6 +139,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@drawable/ic_arrow_left"
+                        app:tint="@color/secondary_color"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent" />
@@ -157,6 +164,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Бег"
+                        android:textColor="@color/text_color"
                         android:textSize="14sp" />
                     <TextView
                         android:id="@+id/difficultyText"
@@ -166,6 +174,7 @@
                         android:gravity="end"
                         android:text="Легкий"
                         android:textSize="14sp"
+                        android:textColor="@color/text_color"
                         android:background="@null" />
                 </LinearLayout>
             </LinearLayout>
@@ -182,7 +191,7 @@
         android:layout_marginBottom="8dp"
         android:textAlignment="textStart"
         android:text="Прежде чем вы начнете, мы рекомендуем вам обратиться за советом к врачу, нежели следовать планам на своё усмотрение."
-        android:textColor="@color/gray"
+        android:textColor="@color/secondary_color"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/doneButton"
         app:layout_constraintEnd_toEndOf="parent"

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@color/white">
+    android:background="@color/cardview_background">
 
     <!-- Кнопка "Готово" -->
     <com.google.android.material.button.MaterialButton
@@ -28,13 +28,15 @@
             android:id="@+id/numPickerHour"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:theme="@style/NumberPickerStyle"/>
 
         <NumberPicker
             android:id="@+id/numPickerMin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:theme="@style/NumberPickerStyle"/>
 
     </LinearLayout>
 </LinearLayout>

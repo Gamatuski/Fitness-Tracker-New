@@ -2,6 +2,7 @@ package com.example.fitnesstracker.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
@@ -56,6 +58,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        setupTheme();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -71,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         errorTextView = findViewById(R.id.errorTextView);
 
         progressBar = findViewById(R.id.progressBar);
+
 
 
 
@@ -107,6 +113,34 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    /**
+     * Настройка темы приложения в соответствии с системными настройками
+     */
+    private void setupTheme() {
+        // Получаем текущую конфигурацию системы
+        int nightModeFlags = getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK;
+
+        // Проверяем, включен ли темный режим в системе
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                // Темный режим включен в системе
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Темный режим выключен в системе
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                // Режим не определен, используем светлую тему по умолчанию
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+        }
+
+        // Альтернативный вариант - просто следовать системным настройкам:
+        // AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     }
 
     private void setupFocusListeners() {
@@ -227,8 +261,6 @@ public class LoginActivity extends AppCompatActivity {
         // Красная обводка для поля пароля
         passwordEditText.setBackgroundResource(R.drawable.edittext_error_background);
 
-        // Красная обводка для карточки
-        loginCard.setCardBackgroundColor(Color.parseColor("#FFF0F0")); // Светло-красный фон
 
         // После получения ответа от сервера:
         runOnUiThread(() -> {
@@ -245,7 +277,5 @@ public class LoginActivity extends AppCompatActivity {
         // Возвращаем стандартный фон для поля пароля
         passwordEditText.setBackgroundResource(R.drawable.edittext_background);
 
-        // Возвращаем стандартный фон для карточки
-        loginCard.setCardBackgroundColor(Color.WHITE);
     }
 }

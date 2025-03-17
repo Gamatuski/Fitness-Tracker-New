@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/background">
 
     <!-- Заголовок "Тренировка" -->
     <TextView
@@ -12,13 +13,14 @@
         android:layout_height="wrap_content"
         android:text="Настройки"
         android:textSize="18sp"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:layout_marginBottom="16dp" />
 
     <!-- CardView с элементами -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/cardview_background"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
         android:layout_marginBottom="16dp">
@@ -44,7 +46,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_report"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginEnd="16dp"
+                    app:tint="@color/text_color"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -52,13 +55,14 @@
                     android:layout_weight="1"
                     android:text="Еженедельный отчёт"
                     android:textSize="16sp"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/text_color" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_left"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    app:tint="@color/secondary_color"/>
             </LinearLayout>
 
             <!-- Серая линия -->
@@ -91,13 +95,14 @@
                     android:layout_weight="1"
                     android:text="Google Fit"
                     android:textSize="16sp"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/text_color" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_left"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    app:tint="@color/secondary_color"/>
             </LinearLayout>
             <!-- Серая линия -->
             <View
@@ -119,7 +124,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_edit"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginEnd="16dp"
+                    app:tint="@color/text_color"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -127,13 +133,14 @@
                     android:layout_weight="1"
                     android:text="Изменить цели"
                     android:textSize="16sp"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/text_color" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_left"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    app:tint="@color/secondary_color"/>
             </LinearLayout>
 
             <!-- Серая линия -->
@@ -170,7 +177,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_left"
-
+                    app:tint="@color/secondary_color"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
         </LinearLayout>

@@ -6,10 +6,9 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
     android:layout_gravity="center_horizontal"
-
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardBackgroundColor="@color/cardview_background">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Удаить активность"
+            android:textColor="@color/text_color"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center"
@@ -33,6 +33,7 @@
             android:id="@+id/dialogMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_color"
             android:text="Вы уверены, что хотите удалить активность?"
             android:textSize="16sp"
             android:gravity="center"
@@ -54,7 +55,7 @@
                 android:layout_weight="1"
                 android:text="Нет"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_color"
                 android:layout_marginEnd="8dp"/>
 
             <!-- Кнопка "Да" -->

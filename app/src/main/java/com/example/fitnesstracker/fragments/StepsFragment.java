@@ -373,12 +373,14 @@ public class StepsFragment extends Fragment implements OnChartValueSelectedListe
         xAxis.setLabelCount(7); // Количество меток (7 дней)
         xAxis.setValueFormatter(new IndexAxisValueFormatter(getDaysOfWeek())); // Подписи дней недели
         xAxis.setDrawGridLines(false);
+        xAxis.setTextColor(R.color.secondary_color);
 
         YAxis yAxis = barChart.getAxisLeft();
         yAxis.setAxisMinimum(0f); // Минимальное значение
         yAxis.setDrawLabels(false); // Включение подписей оси Y
         yAxis.setDrawGridLines(false); // Отключаем сетку оси Y
         yAxis.setDrawAxisLine(false); // Remove the vertical line next to Y axis
+        yAxis.setTextColor(R.color.secondary_color);
         barChart.getAxisRight().setEnabled(false); // Отключение правой оси Y
 
 

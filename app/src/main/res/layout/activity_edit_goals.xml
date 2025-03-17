@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="@color/cardview_background">
 
     <!-- Надпись "Отменить" -->
     <TextView
@@ -15,7 +16,7 @@
         android:clickable="true"
         android:focusable="true"
         android:text="Отменить"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Изменить цели"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/cancelTextView"
@@ -94,6 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:textColor="@color/text_color"
                     android:text="5000"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -139,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:text="Шаги"
                 android:textSize="18sp"
-                android:textColor="@color/black"
+                android:textColor="@color/text_color"
                 android:layout_marginEnd="8dp" />
 
             <!-- Иконка для шагов -->
@@ -194,6 +196,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="10"
+                    android:textColor="@color/text_color"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </FrameLayout>
@@ -238,7 +241,7 @@
                 android:layout_height="wrap_content"
                 android:text="Километр"
                 android:textSize="18sp"
-                android:textColor="@color/black"
+                android:textColor="@color/text_color"
                 android:layout_marginEnd="8dp" />
 
             <!-- Иконка для расстояния -->

@@ -1,5 +1,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFF"/> <!-- Цвет фона -->
+    <solid android:color="@color/cardview_background"/> <!-- Цвет фона -->
     <stroke android:width="2dp" android:color="#FF0000"/> <!-- Красная обводка -->
     <corners android:radius="8dp"/> <!-- Закруглённые углы -->
 </shape>

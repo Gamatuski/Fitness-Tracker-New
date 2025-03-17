@@ -1,0 +1,8 @@
+<resources>
+    <color name="background">#1c1c1e</color>
+    <color name="cardview_background">#000000</color>
+    <color name="text_color">#FFFFFF</color>
+    <color name="primary_color">#775eeb</color>
+    <color name="secondary_color">#808080</color>
+    <color name="error_color">#F44336</color>
+</resources>

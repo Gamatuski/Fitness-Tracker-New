@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -45,6 +46,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.fitnesstracker.R;
 import com.example.fitnesstracker.activities.CountdownActivity;
+import com.example.fitnesstracker.adapters.CustomSpinnerAdapter;
 import com.example.fitnesstracker.api.FitnessApi;
 import com.example.fitnesstracker.api.RetrofitClient;
 import com.example.fitnesstracker.models.ActivityData;
@@ -66,6 +68,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -212,14 +215,21 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
         minusButton = view.findViewById(R.id.minusButton);
         plusButton = view.findViewById(R.id.plusButton);
 
-        // Инициализация выпадающего списка
-        activitySpinner = view.findViewById(R.id.activitySpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                requireContext(),
-                R.array.activities_array,
-                android.R.layout.simple_spinner_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner activitySpinner = view.findViewById(R.id.activitySpinner);
+
+        // Получаем массив строк из ресурсов
+        String[] activitiesArray = getResources().getStringArray(R.array.activities_array);
+
+        // Преобразуем массив в List<String>
+        List<String> activitiesList = Arrays.asList(activitiesArray);
+
+        // Массив иконок
+        int[] icons = {R.drawable.ic_runnuig_man, R.drawable.ic_walking_man, R.drawable.ic_nord_walking_man, R.drawable.ic_cycling_man};
+
+        // Создаем адаптер
+        CustomSpinnerAdapter adapter = new CustomSpinnerAdapter(requireContext(), activitiesList, icons);
+
+        // Устанавливаем адаптер для Spinner
         activitySpinner.setAdapter(adapter);
 
 
@@ -319,6 +329,23 @@ public class StartFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap; // Сохраняем ссылку на GoogleMap
 
+        // Определяем текущую тему
+        int nightModeFlags = requireContext().getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK;
+
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            // Применяем темную тему для карты
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style_dark
+            ));
+        } else {
+            // Применяем светлую тему для карты
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style_light
+            ));
+        }
 
 
         // Настройка карты

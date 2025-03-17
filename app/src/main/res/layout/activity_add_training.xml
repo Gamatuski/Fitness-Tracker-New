@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="@color/background">
 
     <TextView
         android:id="@+id/cancelTextView"
@@ -14,7 +15,7 @@
         android:clickable="true"
         android:focusable="true"
         android:text="Отменить"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Тренировка"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/cancelTextView"
@@ -41,7 +42,7 @@
         android:clickable="true"
         android:focusable="true"
         android:text="Сохранить"
-        android:textColor="@color/black"
+        android:textColor="@color/text_color"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/cancelTextView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -55,6 +56,7 @@
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/cardview_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trainingTextView">
@@ -64,7 +66,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:background="@color/cardview_light_background">
+            android:background="@color/cardview_background">
 
             <LinearLayout
                 android:id="@+id/actionLayout"
@@ -79,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Действие:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_color"
                     android:textSize="16sp" />
 
                 <TextView
@@ -100,6 +102,7 @@
                     android:layout_height="16dp"
                     android:src="@drawable/ic_arrow_left"
                     android:layout_marginTop="1dp"
+                    app:tint="@color/purpule"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -125,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Растояние:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_color"
                     android:textSize="16sp" />
 
                 <EditText
@@ -161,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Калории:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_color"
                     android:textSize="16sp" />
 
                 <EditText
@@ -197,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Шаги:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_color"
                     android:textSize="16sp" />
 
                 <EditText
@@ -232,7 +235,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Длительность:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_color"
                     android:textSize="16sp" />
 
                 <EditText
@@ -267,7 +270,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Дата начала:"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_color"
                     android:textSize="16sp" />
 
                 <TextView

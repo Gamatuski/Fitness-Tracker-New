@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
-    android:background="@color/smoky_white">
+    android:background="@color/background">
 
     
 
@@ -51,7 +51,7 @@
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:text="---"
-                android:textColor="#000"
+                android:textColor="@color/text_color"
                 android:textSize="40sp" />
 
             <TextView
@@ -178,5 +178,6 @@
         android:src="@drawable/ic_share"
         android:clickable="true"
         android:focusable="true"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:background="?android:attr/selectableItemBackground"
+        app:tint="@color/text_color"/>
 </FrameLayout>

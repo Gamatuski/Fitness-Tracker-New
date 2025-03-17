@@ -8,7 +8,7 @@
 
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="@color/cardview_background"
     >
 
     <!-- Внутренний макет -->
@@ -26,6 +26,7 @@
             android:text="Выход из приложения"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@color/text_color"
             android:gravity="center"
             android:paddingBottom="8dp"/>
 
@@ -36,6 +37,7 @@
             android:layout_height="wrap_content"
             android:text="Вы уверены, что хотите выйти?"
             android:textSize="16sp"
+            android:textColor="@color/text_color"
             android:gravity="center"
             android:paddingBottom="16dp"/>
 
@@ -55,7 +57,7 @@
                 android:layout_weight="1"
                 android:text="Нет"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_color"
                 android:layout_marginEnd="8dp"/>
 
             <!-- Кнопка "Да" -->
