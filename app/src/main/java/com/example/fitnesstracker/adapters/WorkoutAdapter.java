@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -21,6 +22,7 @@ import com.example.fitnesstracker.fragments.WorkoutDetailActivity;
 import com.example.fitnesstracker.models.Workout;
 import java.util.List;
 import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutViewHolder> {
 
@@ -91,19 +93,23 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutV
     }
 
     public static class WorkoutViewHolder extends RecyclerView.ViewHolder {
-        ImageView workoutImage;
+        ShapeableImageView workoutImage;
         TextView workoutName;
         ImageView distanceIcon;
         TextView difficultyText;
         TextView workoutsPerWeekText;
+        CardView cardView;
 
         public WorkoutViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.cardView); //
             workoutImage = itemView.findViewById(R.id.workoutImage);
             workoutName = itemView.findViewById(R.id.workoutName);
             distanceIcon = itemView.findViewById(R.id.distanceIcon);
             difficultyText = itemView.findViewById(R.id.difficultyText);
             workoutsPerWeekText = itemView.findViewById(R.id.workoutsPerWeekText);
+
+            cardView.setPreventCornerOverlap(false);
         }
     }
 }

@@ -5,15 +5,16 @@
     <color name="purpule">#775eeb</color>
     <color name="purple2">#925bed</color>
     <color name="gray">#808080</color>
-    <color name="red">#F44336</color>
     <color name="smoky_white">#f2f2f6</color>
     <color name="light_gray">#D3D3D3</color>
     <color name="yellow">#d39969</color>
-    <color name="green">#19b80b</color>
-    <color name="blue">#3333ff</color>
     <color name="transperent_white">#0FFFFFFF</color>
     <color name="transparent">#00000000</color>
 
+
+    <color name="red">#FF5252</color>      <!-- Softer red -->
+    <color name="green">#4CAF50</color>    <!-- Material green -->
+    <color name="blue">#448AFF</color>     <!-- Light blue -->
     <color name="background">#f2f2f6</color>
     <color name="cardview_background">#FFFFFF</color>
     <color name="text_color">#000000</color>

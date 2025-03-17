@@ -33,4 +33,9 @@
         <item name="android:textColorHint">@color/secondary_color</item>
         <item name="android:background">@color/cardview_background</item>
     </style>
+
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 </resources>

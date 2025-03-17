@@ -3,33 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:cardView="http://schemas.android.com/tools"
     android:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/cardview_background">
+    app:cardCornerRadius="8dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardBackgroundColor="@color/cardview_background"
+    android:id="@+id/cardView">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/workoutImage"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="150dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/workout_placeholder"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:shapeAppearanceOverlay="@style/RoundedImageView"
+            android:src="@drawable/workout_placeholder" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/workoutImage">
+            android:layout_below="@id/workoutImage">
 
-            <!-- Название тренировки -->
             <TextView
                 android:id="@+id/workoutName"
                 android:layout_width="wrap_content"
@@ -40,21 +40,17 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- Иконка дистанции и уровень сложности -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
-                <!-- Иконка дистанции -->
                 <ImageView
                     android:id="@+id/distanceIcon"
                     android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/distance_ic" />
+                    android:layout_height="24dp" />
 
-                <!-- Уровень сложности -->
                 <TextView
                     android:id="@+id/difficultyText"
                     android:layout_width="wrap_content"
@@ -65,7 +61,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Количество тренировок в неделю -->
             <TextView
                 android:id="@+id/workoutsPerWeekText"
                 android:layout_width="wrap_content"
@@ -76,5 +71,5 @@
                 android:textColor="@color/text_color"
                 android:textSize="12sp" />
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

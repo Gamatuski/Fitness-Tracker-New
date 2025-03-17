@@ -25,12 +25,13 @@
             android:orientation="vertical">
 
             <!-- Изображение Workout -->
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/workoutImage"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/workout_placeholder" />
+                android:src="@drawable/workout_placeholder"
+                app:shapeAppearanceOverlay="@style/RoundedImageView"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
